@@ -79,11 +79,11 @@ HF_SUMMARIZER = "Falconsai/medical_summarization"  # T5-small, Apache-2.0
 # Research / training defaults (notebooks)
 # ----------------------------------------------------------------------------
 TRAIN_MAX_SEQ_LEN = 64            # sentences in PubMed RCT are short
-TRAIN_SUBSET_SENTENCES = 8_000    # stratified training subset for transformers (CPU: ~5 s per step)
-TRAIN_BATCH_SIZE = 32
-TRAIN_EPOCHS = 2
-TRAIN_LR = 3e-5
-TEST_SUBSET_SENTENCES = 5_000     # shared test subset so every model is compared fairly
+TRAIN_SUBSET_SENTENCES = 3_000    # stratified training subset for transformers (CPU: several s per step)
+TRAIN_BATCH_SIZE = 16
+TRAIN_EPOCHS = 1
+TRAIN_LR = 5e-5
+TEST_SUBSET_SENTENCES = 2_000     # shared test subset so every model is compared fairly
 
 # ----------------------------------------------------------------------------
 # Inference / deployment (Flask app)
@@ -106,3 +106,10 @@ MAX_TEXT_CHARS = 60_000
 MIN_TEXT_CHARS = 40
 
 SECRET_KEY = os.environ.get("MEDISCOPE_SECRET_KEY", "dev-only-change-me")
+
+# Application limits (keep request time reasonable on a CPU laptop)
+MAX_SENTENCES_CLASSIFY = 250
+NER_MAX_CHARS = 20_000
+SUM_MAX_CHUNKS = 6
+EXPLAIN_MAX_SENTENCES = 8         # occlusion is costly for neural models; linear models explain every sentence
+HISTORY_MAX_ROWS = 200

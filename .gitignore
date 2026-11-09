@@ -239,3 +239,9 @@ instance/*
 !instance/.gitkeep
 uploads_tmp/
 .env
+artifacts/classification/transformers/
+artifacts/classification/bilstm/
+artifacts/classification/models/
+artifacts/ner/biobert/
+artifacts/ner/dictionary.json
+artifacts/summarization/t5_medical/

@@ -1,0 +1,38 @@
+{# Variable: c (classification result dict) #}
+<div class="grid asym">
+  <div>
+    <div class="label">Abstract structure — {{ c.sentences|length }} sentence{{ 's' if c.sentences|length != 1 }}{% if c.truncated %} (first {{ c.sentences|length }} only){% endif %}</div>
+    <div class="structure" role="img" aria-label="Distribution of sentence roles">
+      {% for l in CLASS_LABELS %}{% if c.counts[l] %}<span class="bg-{{ l }}" style="width:{{ c.counts[l] / c.sentences|length * 100 }}%" title="{{ l }}: {{ c.counts[l] }}"></span>{% endif %}{% endfor %}
+    </div>
+    <div class="legend">{% for l in CLASS_LABELS %}<span><i class="bg-{{ l }}"></i>{{ l.title() }} {{ c.counts[l] }}</span>{% endfor %}</div>
+    <div style="margin-top:18px" role="list">
+      {% for s in c.sentences %}
+      <div class="sent" role="listitem" tabindex="0" data-i="{{ loop.index0 }}" aria-label="Sentence {{ loop.index }}, {{ s.label }}">
+        <div class="rail bg-{{ s.label }}"></div>
+        <p>{{ s.text }}</p>
+        <div class="meta"><span class="chip role-{{ s.label }}">{{ s.label }}</span><br>{{ '%.0f'|format(s.score * 100) }}%</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% if c.key_findings %}<div class="section"><h2>Key findings <small>verbatim sentences</small></h2>
+      <ul>{% for k in c.key_findings %}<li style="margin-bottom:8px;font-family:var(--serif)">{{ k.text }} <span class="chip role-{{ k.label }}">{{ k.label }}</span></li>{% endfor %}</ul>
+      <p class="small muted">Most central sentences among those labelled RESULTS or CONCLUSIONS — copied from the text, never generated.</p></div>{% endif %}
+  </div>
+  <aside class="detail panel" id="detail" aria-live="polite">
+    <div class="eyebrow">Selected sentence</div>
+    <span id="d-label" class="chip">—</span>
+    <p class="mono muted" id="d-score" style="margin:8px 0"></p>
+    <p id="d-text" style="font-family:var(--serif);font-size:.95rem"></p>
+    <div class="label">Probability distribution <span class="muted">(uncalibrated)</span></div>
+    <div class="chartbox short"><canvas id="d-chart" aria-label="Probability distribution across roles" role="img"></canvas></div>
+    <div class="label" style="margin-top:14px">Alternative roles</div>
+    <ul class="terms" id="d-alt"></ul>
+    <div class="label" style="margin-top:14px">Important terms</div>
+    <ul class="terms" id="d-terms"></ul>
+    <p class="small muted" style="margin-top:10px">{{ c.explain_method }}. Green bars support the predicted role, terracotta bars argue against it. This describes the model, not medical causation.</p>
+    <dl class="kv" style="margin-top:14px"><dt>Model</dt><dd>{{ c.model.name }}</dd><dt>Type</dt><dd>{{ c.model.kind }}</dd>
+      <dt>Test macro-F1</dt><dd>{{ c.model.macro_f1|num(3) }}</dd><dt>Latency</dt><dd>{{ c.model.latency_ms|num(2) }} ms/sent</dd><dt>Score type</dt><dd>{{ c.model.score_type }}</dd></dl>
+  </aside>
+</div>
+<script id="cls-data" type="application/json">{{ c.sentences|tojson }}</script>

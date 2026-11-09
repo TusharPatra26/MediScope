@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Module 3</div><h1>Summarization Studio</h1>
+  <p>Long documents are split into sentence-preserving chunks, summarised locally by a T5 model, and refined. Choose a length and compare the original with the summary side by side.</p></div>
+<form method="post" enctype="multipart/form-data" data-process="Generating summary">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="grid asym"><div>{% include 'components/_input.html' %}</div>
+  <div class="panel sunken">
+    <div class="field"><label for="length">Summary length</label>
+      <select id="length" name="length">{% for l in lengths %}<option value="{{ l }}" {{ 'selected' if (request.form.get('length') or default_length) == l }}>{{ l.title() }}</option>{% endfor %}</select></div>
+    <button class="btn" type="submit">Summarise</button>
+    <p class="small muted" style="margin-top:12px">Pretrained T5-small (not fine-tuned in this project). CPU generation takes seconds per chunk.</p>
+  </div></div>
+</form>
+{% if analysis %}
+<hr class="rule">
+<div class="row" style="justify-content:space-between"><h2 style="margin:0">Original vs summary</h2>
+  <div class="row"><a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='pdf') }}">Export PDF</a><a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='txt') }}">Export TXT</a></div></div>
+<p class="mono muted">{{ '%.1f'|format(analysis.timings.summary) }} s · {{ analysis.doc.stats.words }} words in</p>
+{% set s = analysis.summary %}{% set source = source %}{% include 'components/_summary.html' %}
+<div class="section"><h2>Document statistics</h2>{% include 'components/_docstats.html' %}</div>
+{% endif %}
+{% endblock %}

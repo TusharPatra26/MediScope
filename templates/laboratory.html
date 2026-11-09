@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Experiments</div><h1>Model Laboratory</h1>
+  <p>Every number on this page is read from files written by the experiment notebooks (<span class="mono">artifacts/</span>). Nothing is typed in by hand. If a section is empty, the corresponding notebook has not been run.</p></div>
+
+{% if not bench %}
+<div class="notice err">No benchmark found. Run <span class="mono">notebooks/04–06</span> and then <span class="mono">10_model_benchmarking.ipynb</span> to create <span class="mono">artifacts/evaluation/benchmark.json</span>.</div>
+{% else %}
+{% set rows = bench.rows|sort(attribute='macro_f1', reverse=true) %}
+{% set famcolor = {'classical': '#344C3D', 'deep learning': '#BD755A', 'transformer': '#C4A46A'} %}
+
+<div class="section" style="margin-top:0"><h2>Leaderboard <small>shared stratified test subset · n = {{ bench.n_test }} sentences · bootstrap 95% CI</small></h2>
+  {% if deployed %}<div class="notice ok"><strong>Deployed model:</strong> {{ deployed.label }}. {{ deployed.rationale }}</div>{% endif %}
+  <div class="tablewrap"><table>
+    <thead><tr><th>Model</th><th>Family</th><th class="n">Train n</th><th class="n">Macro-F1</th><th class="n">95% CI</th><th class="n">Weighted-F1</th><th class="n">Accuracy</th><th class="n">Macro-P</th><th class="n">Macro-R</th><th class="n">Train s</th><th class="n">ms / sent</th><th class="n">MB</th></tr></thead>
+    <tbody>{% for r in rows %}<tr class="{{ 'best' if deployed and deployed.name == r.key }}"><td>{{ r.label }}{% if deployed and deployed.name == r.key %} <span class="chip" style="color:var(--forest)">deployed</span>{% endif %}</td><td>{{ r.family }}</td>
+      <td class="n">{{ '{:,}'.format(r.train_n) }}</td><td class="n"><strong>{{ '%.4f'|format(r.macro_f1) }}</strong></td><td class="n">{{ '%.3f'|format(r.ci_lo) }}–{{ '%.3f'|format(r.ci_hi) }}</td><td class="n">{{ '%.4f'|format(r.weighted_f1) }}</td><td class="n">{{ '%.4f'|format(r.accuracy) }}</td>
+      <td class="n">{{ '%.3f'|format(r.precision_macro) }}</td><td class="n">{{ '%.3f'|format(r.recall_macro) }}</td><td class="n">{{ '%.0f'|format(r.train_seconds) }}</td><td class="n">{{ '%.2f'|format(r.latency_ms) }}</td><td class="n">{{ '%.1f'|format(r.model_mb) }}</td></tr>{% endfor %}</tbody></table></div>
+  <p class="small muted" style="margin-top:10px"><strong>Read with care:</strong> training budgets differ (see “Train n”). Classical NB/LR/SVM saw the full training set, the transformers a small CPU-feasible subset, so the table compares <em>deployable systems</em>, not architectures. Latency was measured on a shared CPU and is best used as a relative indicator.</p></div>
+
+{% set labels = [] %}{% set f1s = [] %}{% set cols = [] %}{% set errs = [] %}
+{% for r in rows|reverse %}{% set _ = labels.append(r.label) %}{% set _ = f1s.append((r.macro_f1 * 1000)|round / 1000) %}{% set _ = cols.append(famcolor[r.family]) %}{% endfor %}
+<div class="section"><h2>F1-score comparison <small>classical ML vs deep learning vs transformers</small></h2>
+  <div class="grid g2">
+    <div><div class="chartbox" style="height:{{ 40 * rows|length + 60 }}px"><canvas aria-label="Macro-F1 by model" role="img" data-config="{{ {'type': 'bar', 'data': {'labels': labels, 'datasets': [{'label': 'macro-F1', 'data': f1s, 'backgroundColor': cols}]}, 'options': {'indexAxis': 'y', 'plugins': {'legend': {'display': False}}, 'scales': {'x': {'min': 0.4}}}}|tojson|forceescape }}"></canvas></div>
+      <div class="legend">{% for f, c in famcolor.items() %}<span><i style="background:{{ c }}"></i>{{ f }}</span>{% endfor %}</div></div>
+    <div><div class="label">Macro-F1 vs inference latency <span class="muted">(ms per sentence, log)</span></div>
+      {% set pts = [] %}{% for r in rows %}{% set _ = pts.append({'x': r.latency_ms, 'y': r.macro_f1, 'label': r.label}) %}{% endfor %}
+      <div class="chartbox"><canvas aria-label="F1 versus latency" role="img" data-config="{{ {'type': 'scatter', 'data': {'datasets': [{'label': 'models', 'data': pts, 'backgroundColor': cols|reverse|list, 'pointRadius': 7}]}, 'options': {'plugins': {'legend': {'display': False}, 'tooltip': {'callbacks': {}}}, 'scales': {'x': {'type': 'logarithmic', 'title': {'display': True, 'text': 'ms / sentence'}}, 'y': {'title': {'display': True, 'text': 'macro-F1'}}}}}|tojson|forceescape }}"></canvas></div></div>
+  </div>
+</div>
+
+<div class="section"><h2>Training time and inference latency <small>log scale</small></h2>
+  {% set tt = [] %}{% set lt = [] %}{% for r in rows|reverse %}{% set _ = tt.append(r.train_seconds|round(1)) %}{% set _ = lt.append(r.latency_ms|round(3)) %}{% endfor %}
+  <div class="grid g2"><div class="chartbox short" style="height:{{ 26 * rows|length + 70 }}px"><canvas aria-label="Training time" role="img" data-config="{{ {'type': 'bar', 'data': {'labels': labels, 'datasets': [{'label': 'training seconds', 'data': tt, 'backgroundColor': cols}]}, 'options': {'indexAxis': 'y', 'plugins': {'legend': {'display': False}, 'title': {'display': True, 'text': 'Training time (s)'}}, 'scales': {'x': {'type': 'logarithmic'}}}}|tojson|forceescape }}"></canvas></div>
+  <div class="chartbox short" style="height:{{ 26 * rows|length + 70 }}px"><canvas aria-label="Inference latency" role="img" data-config="{{ {'type': 'bar', 'data': {'labels': labels, 'datasets': [{'label': 'ms per sentence', 'data': lt, 'backgroundColor': cols}]}, 'options': {'indexAxis': 'y', 'plugins': {'legend': {'display': False}, 'title': {'display': True, 'text': 'Inference latency (ms / sentence)'}}, 'scales': {'x': {'type': 'logarithmic'}}}}|tojson|forceescape }}"></canvas></div></div>
+</div>
+
+<div class="section"><h2>Confusion matrices <small>shared test subset · rows = true role, shading = share of row</small></h2>
+  <div class="tabs" role="tablist" aria-label="Model">{% for r in rows %}<button role="tab" id="tab-{{ loop.index }}" aria-controls="cm-{{ loop.index }}" aria-selected="{{ 'true' if loop.first else 'false' }}">{{ r.label.split(' (')[0] }}</button>{% endfor %}</div>
+  {% for r in rows %}{% set cm = r.confusion_matrix %}
+  <div class="tabpanel" id="cm-{{ loop.index }}" role="tabpanel" {{ 'hidden' if not loop.first }}>
+    <div class="tablewrap"><table style="max-width:640px"><thead><tr><th>true ↓ / predicted →</th>{% for l in bench.labels %}<th class="n">{{ l[:5] }}</th>{% endfor %}</tr></thead><tbody>
+      {% for row in cm %}{% set ri = loop.index0 %}{% set tot = row|sum %}<tr><td>{{ bench.labels[ri] }}</td>{% for v in row %}<td class="n" style="background:rgba(189,117,90,{{ (0.08 + 0.7 * v / (tot or 1)) if v else 0 }});{{ 'font-weight:600' if loop.index0 == ri }}">{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+    <p class="small muted" style="margin-top:8px">{{ r.label }} — per-class F1: {% for l in bench.labels %}{{ l.title() }} {{ '%.2f'|format(r.per_class[l].f1) }}{{ ' · ' if not loop.last }}{% endfor %}</p>
+  </div>{% endfor %}
+</div>
+{% endif %}
+
+<div class="section"><h2>Calibration <small>uncalibrated scores · expected calibration error</small></h2>
+  {% if calibration %}<div class="tablewrap"><table style="max-width:640px"><thead><tr><th>Model</th><th class="n">ECE</th><th class="n">Accuracy</th><th class="n">Mean confidence</th></tr></thead><tbody>
+    {% for k, v in calibration.items() %}<tr><td>{{ v.model }}</td><td class="n">{{ '%.3f'|format(v.ECE) }}</td><td class="n">{{ '%.3f'|format(v.accuracy) }}</td><td class="n">{{ '%.3f'|format(v['mean confidence']) }}</td></tr>{% endfor %}</tbody></table></div>
+    <p class="small muted">Lower ECE is better. Confidence above accuracy means over-confidence — the reason scores are never presented as certainty. From notebook 09.</p>
+  {% else %}<p class="muted">Run notebook 09 to measure calibration.</p>{% endif %}</div>
+
+<div class="section"><h2>Biomedical NER <small>BC5CDR · strict entity-level</small></h2>
+  {% if ner %}<div class="tablewrap"><table style="max-width:760px"><thead><tr><th>System</th><th class="n">Precision</th><th class="n">Recall</th><th class="n">F1</th><th>Notes</th></tr></thead><tbody>
+    {% set e = ner.biobert.entity_level %}<tr><td>BioBERT (fine-tuned on {{ ner.biobert.train_n }} sentences)</td><td class="n">{{ '%.3f'|format(e.precision) }}</td><td class="n">{{ '%.3f'|format(e.recall) }}</td><td class="n"><strong>{{ '%.3f'|format(e.f1) }}</strong></td><td class="small muted">{{ ner.biobert.test_n }}-sentence test subset</td></tr>
+    {% set e = ner.dictionary_1k.entity_level_on_subset %}<tr><td>Dictionary (same {{ ner.dictionary_1k.train_n }} sentences)</td><td class="n">{{ '%.3f'|format(e.precision) }}</td><td class="n">{{ '%.3f'|format(e.recall) }}</td><td class="n">{{ '%.3f'|format(e.f1) }}</td><td class="small muted">like-for-like baseline</td></tr>
+    {% set e = ner.dictionary.entity_level_on_subset %}<tr><td>Dictionary (all train+dev, {{ '{:,}'.format(ner.dictionary.lexicon_size) }} mentions)</td><td class="n">{{ '%.3f'|format(e.precision) }}</td><td class="n">{{ '%.3f'|format(e.recall) }}</td><td class="n">{{ '%.3f'|format(e.f1) }}</td><td class="small muted">same subset, much more data</td></tr></tbody></table></div>
+    <p class="small muted" style="margin-top:8px">Per type (BioBERT): {% for t, v in ner.biobert.entity_level.per_type.items() %}{{ t }} F1 {{ '%.3f'|format(v.f1) }} (n={{ v.support }}){{ ' · ' if not loop.last }}{% endfor %}. Trained on a small subset because of CPU limits — see notebook 07.</p>
+  {% else %}<p class="muted">Run notebook 07 to evaluate NER.</p>{% endif %}</div>
+
+<div class="section"><h2>Summarization <small>ROUGE vs reference abstracts</small></h2>
+  {% if summ %}<div class="tablewrap"><table style="max-width:760px"><thead><tr><th>System</th><th class="n">ROUGE-1</th><th class="n">ROUGE-2</th><th class="n">ROUGE-L</th><th class="n">BERTScore-F1*</th><th class="n">s/doc</th></tr></thead><tbody>
+    {% for name, v in summ.systems.items() %}<tr><td>{{ name }}</td><td class="n">{{ '%.3f'|format(v['ROUGE-1']) }}</td><td class="n">{{ '%.3f'|format(v['ROUGE-2']) }}</td><td class="n">{{ '%.3f'|format(v['ROUGE-L']) }}</td><td class="n">{{ '%.3f'|format(v['BERTScore-F1']) if v['BERTScore-F1'] is defined else 'n/a' }}</td><td class="n">{{ '%.1f'|format(v['s / doc']) }}</td></tr>{% endfor %}</tbody></table></div>
+    <p class="small muted" style="margin-top:8px">{{ summ.n_docs }} test articles; {{ summ.protocol }}. {{ summ.bertscore_note }} Summarizer is pretrained, not fine-tuned here.</p>
+  {% else %}<p class="muted">Run notebook 08 to evaluate summarization.</p>{% endif %}</div>
+
+<div class="section"><h2>Dataset information</h2>
+  <div class="grid g3">
+    <div class="panel"><h3>PubMed 20k RCT</h3><dl class="kv">{% if dataset %}{% for sp, v in dataset.pubmed_rct.splits.items() %}<dt>{{ sp }}</dt><dd>{{ '{:,}'.format(v.sentences) }} sent. / {{ '{:,}'.format(v.abstracts) }} abs.</dd>{% endfor %}<dt>Task</dt><dd>sentence role (5 classes)</dd>{% endif %}</dl>
+      <p class="small muted" style="margin-top:10px">Dernoncourt &amp; Lee, IJCNLP 2017. No explicit licence; derived from MEDLINE/PubMed — research use only, not redistributed.</p></div>
+    <div class="panel"><h3>BC5CDR</h3><dl class="kv">{% if dataset %}{% for r in dataset.bc5cdr %}<dt>{{ r.split }}</dt><dd>{{ '{:,}'.format(r.sentences) }} sentences</dd>{% endfor %}<dt>Entities</dt><dd>Chemical, Disease</dd>{% endif %}</dl>
+      <p class="small muted" style="margin-top:10px">BioCreative V CDR (Li et al., 2016) via T-NER. Hub licence field: “other”.</p></div>
+    <div class="panel"><h3>PubMed summarization</h3><dl class="kv">{% if dataset %}<dt>Test articles</dt><dd>{{ '{:,}'.format(dataset.summarization_test.articles) }}</dd><dt>Median article</dt><dd>{{ '{:,.0f}'.format(dataset.summarization_test.median_article_words) }} words</dd><dt>Median abstract</dt><dd>{{ '{:.0f}'.format(dataset.summarization_test.median_abstract_words) }} words</dd>{% endif %}</dl>
+      <p class="small muted" style="margin-top:10px">Cohan et al., 2018 via ccdv/pubmed-summarization (test split only). No licence declared.</p></div>
+  </div>
+</div>
+
+<div class="section"><h2>Model descriptions</h2>
+  <div class="tablewrap"><table><thead><tr><th>Model</th><th>What it is</th><th>Role here</th></tr></thead><tbody>
+    <tr><td>Naive Bayes, Logistic Regression, Linear SVM</td><td>Linear classifiers on TF-IDF 1–2-grams{% if prep %} (preprocessing: <span class="mono">{{ prep.strategy }}</span>){% endif %}</td><td>Fast, interpretable baselines trained on all 180k sentences</td></tr>
+    <tr><td>Random Forest, XGBoost</td><td>Tree ensembles on 20k TF-IDF features</td><td>Test whether non-linear interactions help</td></tr>
+    <tr><td>BiLSTM</td><td>Bidirectional LSTM with masked max-pooling (PyTorch)</td><td>Word-order-aware deep baseline</td></tr>
+    <tr><td>DistilBERT · BERT · BioBERT</td><td>Pretrained transformer encoders fine-tuned for classification</td><td>General-purpose vs biomedical pretraining, small CPU budget</td></tr>
+    <tr><td>BioBERT token classifier</td><td>BioBERT + linear head, BIO tags, first-sub-word labelling</td><td>Chemical / Disease NER</td></tr>
+    <tr><td>T5-small (medical_summarization)</td><td>Pretrained encoder–decoder (Apache-2.0)</td><td>Chunked abstractive summarization; not fine-tuned here</td></tr></tbody></table></div>
+</div>
+{% endblock %}

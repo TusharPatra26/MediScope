@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Project notes</div><h1>About MediScope</h1>
+  <p>A student research project in biomedical NLP: classical ML, a BiLSTM and transformers, evaluated on public data and wrapped in a local, server-rendered Flask application.</p></div>
+
+<div class="grid asym">
+<div>
+  <div class="section" style="margin-top:0"><h2>Motivation</h2>
+    <p>Medical abstracts are dense. Knowing which sentence states the aim, which reports the method and which carries the finding makes skimming faster; knowing which chemicals and diseases are discussed helps orient a reader; a short summary helps triage. MediScope combines these in one place and, more importantly, keeps the evidence for every output visible.</p></div>
+  <div class="section"><h2>Architecture</h2>
+    <pre class="code">Browser ── HTML forms / Jinja2 pages ──► app.py (Flask)
+                                          │
+        ┌─────────────────┬───────────────┼────────────────┐
+   src/classification  src/ner      src/summarization   SQLite history
+   (sklearn·BiLSTM·    (BioBERT +   (T5 + TextRank)     (instance/history.db)
+    transformers)       dictionary)
+        └──────── shared src/preprocessing.py ───────────┘
+   artifacts/  ◄── written by notebooks 04–10 (models, metrics)</pre>
+    <p>There is no REST API and no external service: pages are rendered on the server from form posts, and all inference happens in-process on this machine. Models are loaded once, lazily, and cached.</p></div>
+  <div class="section"><h2>Methodology</h2>
+    <ul>
+      <li><strong>Classification.</strong> Sentence-role labels from PubMed 20k RCT (an abstract-disjoint split). Five classical models on TF-IDF, a BiLSTM and three fine-tuned transformers, compared on a shared test subset with bootstrap confidence intervals.</li>
+      <li><strong>NER.</strong> BC5CDR (Chemical, Disease) with BIO tags and first-sub-word alignment; strict entity-level precision/recall/F1 against a dictionary baseline.</li>
+      <li><strong>Summarization.</strong> Sentence-preserving chunking plus a pretrained T5-small; ROUGE, a small-model BERTScore and grounding proxies against extractive baselines.</li>
+      <li><strong>Explainability.</strong> Exact coefficients for linear models, occlusion for neural models, SHAP/LIME in the notebooks. Attention weights are not used as explanations.</li>
+    </ul></div>
+  <div class="section"><h2>Evaluation honesty</h2>
+    <p>Training ran on a CPU-only laptop in a single session, so the transformers and NER model were fine-tuned on <em>small subsets</em> and the summarizer is <em>pretrained, not fine-tuned</em>. Every metric on the Model Laboratory page is measured; every limitation is stated in the notebooks. Conclusions about architectures should be read as low-resource results.</p></div>
+  <div class="section"><h2>Limitations</h2>
+    <ul><li>Sentences are classified in isolation, which loses the strong positional signal inside an abstract.</li><li>Scores are uncalibrated; the Laboratory reports expected calibration error.</li><li>Training data are randomized-trial abstracts (classification) and chemical/disease mentions (NER); other study types and entity kinds (drugs vs treatments vs genes) are not covered.</li><li>Abstractive summaries can contain unsupported statements and are not verified.</li><li>PDF extraction fails on scanned documents (no OCR).</li></ul></div>
+  <div class="section"><h2>Ethical considerations</h2>
+    <p>MediScope is <strong>not</strong> a diagnostic tool and must not be used for clinical decisions. It processes only public, de-identified research text; do not paste patient records. Uploaded files are read in memory and never stored; history keeps results and short excerpts, and can be erased with one click. The training corpora derive from PubMed, where some abstracts may be copyrighted: data are used for research only, are not redistributed, and the interface shows only short excerpts. Feature attributions describe model behaviour, not medical causation. The datasets contain no demographic attributes, so group fairness could not be assessed.</p></div>
+</div>
+<aside>
+  <div class="panel"><h3>Local status</h3>
+    <dl class="kv"><dt>Classifiers</dt><dd>{{ status.classifiers|length }} found</dd><dt>Deployed</dt><dd>{{ status.deployed or 'none' }}</dd><dt>NER models</dt><dd>{{ status.taggers|join(', ') or 'none' }}</dd><dt>Summarizer</dt><dd>{{ 'ready' if status.summarizer else 'missing' }}</dd></dl>
+    {% if not status.ready %}<p class="small" style="margin-top:12px">Missing models are created by the notebooks: classifiers by 04–06 and 10, NER by 07, the summarizer by 08. No mock predictions are ever substituted.</p>{% endif %}</div>
+  <div class="panel sunken" style="margin-top:22px"><h3>Datasets &amp; attribution</h3>
+    <ul class="small" style="padding-left:18px;margin:0">
+      <li>PubMed 20k RCT — Dernoncourt &amp; Lee (2017)</li><li>BC5CDR — Li et al. (2016), via T-NER</li><li>PubMed summarization — Cohan et al. (2018)</li>
+      <li>BERT, DistilBERT, T5 (Apache-2.0); BioBERT — Lee et al. (2020), licence not machine-declared on its hub page</li>
+      <li>Fonts: Source Serif 4, IBM Plex Sans/Mono (SIL OFL 1.1) · Chart.js (MIT)</li></ul></div>
+</aside></div>
+{% endblock %}

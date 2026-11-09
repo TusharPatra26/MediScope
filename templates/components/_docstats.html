@@ -1,0 +1,9 @@
+{% set s = analysis.doc.stats %}
+<div class="grid g4" style="gap:22px">
+  <div class="stat"><div class="v">{{ '{:,}'.format(s.words) }}</div><div class="l">words</div></div>
+  <div class="stat"><div class="v">{{ s.sentences }}</div><div class="l">sentences</div></div>
+  <div class="stat"><div class="v">{{ s.lexical_diversity }}</div><div class="l">lexical diversity</div><div class="s">{{ '{:,}'.format(s.unique_words) }} unique words</div></div>
+  <div class="stat"><div class="v">{{ s.reading_minutes }}<small style="font-size:1rem"> min</small></div><div class="l">estimated reading time</div><div class="s">{{ s.numbers }} numbers · {{ s.avg_sentence_words }} words/sentence</div></div>
+</div>
+{% if analysis.key_terms %}<div style="margin-top:22px"><div class="label">Key terminology <span class="muted">(frequency, stopwords removed)</span></div>
+  {% for t in analysis.key_terms %}<span class="termpill">{{ t.term }}<b>{{ t.count }}</b></span>{% endfor %}</div>{% endif %}

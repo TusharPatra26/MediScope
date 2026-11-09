@@ -1,0 +1,12 @@
+{# Variables: s (summary dict), source (list of sentences or None), analysis #}
+<div class="compare">
+  <div><h4>Original text{% if source %} · click a summary sentence to find related passages{% endif %}</h4>
+    <div class="srcbox">{% if source %}{% for x in source %}<span class="srcsent">{{ x }}</span>{% endfor %}{% else %}<div class="doc" style="white-space:normal">{{ analysis.text_preview }}{% if analysis.doc.stats.characters > 1200 %}…{% endif %}</div>{% endif %}</div></div>
+  <div><h4>Generated summary · {{ s.length }}</h4>
+    <p class="lede" style="font-size:1.12rem">{% for part in s.summary.replace('? ', '?|').replace('. ', '.|').split('|') %}<span class="sumsent">{{ part }} </span>{% endfor %}</p>
+    <p class="mono muted">{{ s.summary_tokens }} tokens from {{ s.input_tokens }} input tokens · chunks {{ s.n_chunks_used }}/{{ s.n_chunks_total }}{% if s.refined %} · refined{% endif %}</p></div>
+</div>
+{% if s.truncated %}<div class="notice" style="margin-top:14px">The document is long: only the first {{ s.n_chunks_used }} of {{ s.n_chunks_total }} chunks were summarised.</div>{% endif %}
+<div class="notice" style="margin-top:14px">Machine-generated and <strong>not medically verified</strong>; abstractive models can state things the source does not support. Compare with the verbatim key sentences below.<br><span class="muted">Model: {{ s.model }}. Highlighting shows lexical overlap only, not provenance.</span></div>
+{% if s.extractive %}<div class="section"><h2>Key sentences from the source <small>extractive · TF-IDF centrality</small></h2>
+  <ol>{% for e in s.extractive %}<li style="margin-bottom:8px;font-family:var(--serif)">{{ e.text }}</li>{% endfor %}</ol></div>{% endif %}

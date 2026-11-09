@@ -1,0 +1,13 @@
+{# Shared input block: textarea + PDF/TXT dropzone. Optional variable: placeholder #}
+{% set example = "Chronic low back pain is a leading cause of disability and is commonly managed with analgesics. We aimed to evaluate whether a 12-week supervised exercise programme reduces pain intensity compared with usual care. In this randomized controlled trial, 120 adults with chronic low back pain were assigned to exercise (n = 60) or usual care (n = 60). The primary outcome was pain intensity on a 0-10 numeric scale at 12 weeks. Pain decreased by 2.4 points in the exercise group and by 0.9 points in the usual care group (mean difference 1.5, 95% CI 0.8 to 2.2; p < 0.001). No serious adverse events were reported. A supervised exercise programme reduced pain more than usual care in adults with chronic low back pain. These findings should be confirmed in larger multicentre trials." %}
+<div class="field">
+  <label for="text">Research text</label>
+  <textarea id="text" name="text" placeholder="{{ placeholder|default('Paste an abstract or article text…') }}">{{ request.form.get('text', '') }}</textarea>
+  <div class="row" style="justify-content:space-between;margin-top:6px">
+    <button class="btn ghost sm" type="button" data-example="{{ example }}">Load a synthetic example abstract</button>
+    <span class="count">0 characters</span>
+  </div>
+</div>
+<div class="field">
+  <div class="dropzone"><input type="file" name="file" accept=".pdf,.txt" aria-label="Upload a PDF or TXT file"><span class="dz-label">Or drop a PDF / TXT file here (max {{ limits.mb }} MB). It is read in memory and not stored.</span><span class="bar"></span></div>
+</div>

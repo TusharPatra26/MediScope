@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ crumb[-1] if crumb else 'MediScope' }}{% endblock %} · MediScope</title>
+  <meta name="description" content="Making medical research more understandable through intelligent text analytics. Runs fully locally.">
+  <link rel="preload" href="{{ url_for('static', filename='fonts/source-serif-4-600-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+  <script>try{var t=localStorage.getItem('ms-theme');document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  {% set nav = [('index','Overview'),('explorer','Research Explorer'),('classifier','Abstract Classifier'),('ner','Entity Extraction'),('summarizer','Summarization Studio'),('laboratory','Model Laboratory'),('history','Research History'),('about','About')] %}
+  <aside class="sidebar" id="sidebar" aria-label="Primary">
+    <a class="brand" href="{{ url_for('index') }}">Medi<span>Scope</span></a>
+    <p class="tagline">Making medical research more understandable through intelligent text analytics.</p>
+    <nav><ul class="nav">
+      {% for ep, label in nav %}
+      <li><a href="{{ url_for(ep) }}" {% if request.endpoint == ep or (ep == 'history' and request.endpoint == 'history_view') %}aria-current="page"{% endif %}><span class="n">{{ '%02d' % loop.index }}</span>{{ label }}</a></li>
+      {% endfor %}
+    </ul></nav>
+    <div class="side-foot">Educational research tool.<br>Not a diagnostic or clinical decision system. All inference runs on this computer.</div>
+  </aside>
+  <div class="content">
+    <header class="topbar">
+      <div class="row" style="gap:12px">
+        <button class="iconbtn menu-toggle" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="{{ url_for('index') }}">MediScope</a>
+          {% for c in crumb %}<span aria-hidden="true">/</span>{% if loop.last %}<span aria-current="page">{{ c }}</span>{% else %}<span>{{ c }}</span>{% endif %}{% endfor %}
+        </nav>
+      </div>
+      <div class="tools">
+        <span class="status" title="Models found in artifacts/ on this machine">
+          <i class="dot {{ '' if status.ready else ('warn' if status.classifiers or status.taggers or status.summarizer else 'off') }}"></i>
+          <span class="txt">local · {{ 'all models ready' if status.ready else 'some models missing — see About' }}</span>
+        </span>
+        <button class="iconbtn" id="theme-toggle" type="button" aria-label="Toggle theme">☾</button>
+      </div>
+    </header>
+    <main id="main">
+      {% include 'components/_flash.html' %}
+      {% block content %}{% endblock %}
+      <p class="disclaimer">MediScope is an educational research project. Predictions are uncalibrated model outputs and summaries are machine generated; nothing here is medical advice, a diagnosis or a verified fact.</p>
+    </main>
+  </div>
+</div>
+<div class="overlay" id="overlay" role="alert" aria-live="polite"><div class="box">
+  <h3><span class="spin"></span>Analysing locally…</h3>
+  <ol></ol>
+  <p class="mono muted" id="elapsed">0 s elapsed</p>
+  <p class="small muted">Models run on this machine's CPU. Nothing leaves your computer.</p>
+</div></div>
+<script src="{{ url_for('static', filename='js/vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

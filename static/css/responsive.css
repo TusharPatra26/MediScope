@@ -1,0 +1,19 @@
+/* Breakpoints: laptop <= 1180, tablet <= 900, mobile <= 600. Desktop is the primary design target. */
+@media (max-width: 1180px) {
+  main { padding: 32px 28px 64px; } .topbar { padding: 12px 28px; }
+  .g4 { grid-template-columns: repeat(2, 1fr); } .asym { gap: 32px; } .hero h1 { font-size: 2.8rem; }
+}
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; z-index: 30; width: 260px; transform: translateX(-102%); transition: transform .25s; box-shadow: 8px 0 30px -12px rgba(0,0,0,.35); }
+  .sidebar.open { transform: none; }
+  .menu-toggle { display: inline-block; }
+  .g3, .asym, .compare { grid-template-columns: 1fr; } .compare > div + div { border-left: 0; border-top: 1px solid var(--line); }
+  .detail { position: static; } .hero h1 { font-size: 2.4rem; }
+}
+@media (max-width: 600px) {
+  main { padding: 22px 16px 56px; } .topbar { padding: 10px 16px; } .status .txt { display: none; }
+  .g2, .g4 { grid-template-columns: 1fr; } h1 { font-size: 1.8rem; } .hero h1 { font-size: 2rem; }
+  .sent { grid-template-columns: 4px 1fr; } .sent .meta { grid-column: 2; text-align: left; }
+  .kv dd { text-align: left; } .tabs button { padding: 8px 12px; }
+}

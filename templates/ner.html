@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Module 2</div><h1>Entity Extraction</h1>
+  <p>Chemicals and diseases are highlighted with a BioBERT token classifier fine-tuned on BC5CDR (or a dictionary baseline). Toggle categories, hover for confidence, and click a row to find the entity in the text.</p></div>
+<form method="post" enctype="multipart/form-data" data-process="Extracting entities">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="grid asym"><div>{% include 'components/_input.html' %}</div>
+  <div class="panel sunken">
+    <div class="field"><label for="ner_model">Model</label>
+      <select id="ner_model" name="ner_model"><option value="biobert" {{ 'selected' if request.form.get('ner_model','biobert')=='biobert' }}>BioBERT token classifier</option><option value="dictionary" {{ 'selected' if request.form.get('ner_model')=='dictionary' }}>Dictionary baseline</option></select></div>
+    <button class="btn" type="submit">Extract entities</button>
+    <p class="small muted" style="margin-top:12px">Available models: {{ taggers|join(', ') if taggers else 'none — train notebook 07' }}.</p>
+  </div></div>
+</form>
+{% if analysis %}
+<hr class="rule">
+<div class="row" style="justify-content:space-between"><h2 style="margin:0">Highlighted text</h2>
+  <div class="row"><a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='pdf') }}">Export PDF</a><a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='txt') }}">Export TXT</a></div></div>
+<p class="mono muted">{{ analysis.ner.n_entities }} entities · {{ '%.2f'|format(analysis.timings.ner) }} s</p>
+{% set n = analysis.ner %}{% include 'components/_entities.html' %}
+{% endif %}
+{% endblock %}

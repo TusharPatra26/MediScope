@@ -1,0 +1,31 @@
+{
+  "strategy": "raw",
+  "ngram_range": [
+    1,
+    2
+  ],
+  "min_df": 2,
+  "sublinear_tf": true,
+  "max_features": 200000,
+  "evidence": {
+    "strategy_macro_f1": {
+      "raw": 0.7317,
+      "numshape": 0.7245,
+      "clean": 0.7221,
+      "expand": 0.722,
+      "stem": 0.7172,
+      "nostop": 0.6643
+    },
+    "tie_band": 0.0049,
+    "ngram_ablation": {
+      "unigrams": 0.7,
+      "uni+bigrams (default)": 0.7221,
+      "uni+bi+trigrams": 0.7229,
+      "no sublinear TF": 0.7203
+    },
+    "tfidf_vs_word2vec": {
+      "tfidf": 0.7221,
+      "word2vec_mean": 0.684
+    }
+  }
+}

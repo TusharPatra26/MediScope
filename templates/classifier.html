@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Module 1</div><h1>Abstract Classifier</h1>
+  <p>Each sentence of a research abstract is assigned a rhetorical role — background, objective, methods, results or conclusions — trained on PubMed 20k RCT. Select a sentence to see its score distribution, alternative roles and the terms the model relied on.</p></div>
+<form method="post" enctype="multipart/form-data" data-process="Classifying sentences">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="grid asym"><div>{% include 'components/_input.html' %}</div>
+  <div class="panel sunken">
+    <div class="field"><label for="cls_model">Model</label>
+      <select id="cls_model" name="cls_model">{% for o in cls_options %}<option value="{{ o.key }}" {{ 'selected' if o.default }}>{{ o.label }}{{ ' (deployed)' if o.default }}</option>{% else %}<option value="">No trained model found</option>{% endfor %}</select></div>
+    <button class="btn" type="submit">Classify</button>
+    <p class="small muted" style="margin-top:12px"><strong>Uncalibrated scores.</strong> A score of 90% is the model's relative preference, not a 90% chance of being right. See the Model Laboratory for measured calibration.</p>
+  </div></div>
+</form>
+{% if analysis %}
+<hr class="rule">
+<div class="row" style="justify-content:space-between"><h2 style="margin:0">Result</h2>
+  <div class="row"><a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='pdf') }}">Export PDF</a><a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='txt') }}">Export TXT</a></div></div>
+{% set c = analysis.classification %}
+<p class="muted">Dominant role: <strong class="role-{{ c.dominant }}">{{ c.dominant }}</strong> · processed in {{ '%.2f'|format(analysis.timings.classification) }} s</p>
+{% include 'components/_classification.html' %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-head"><div class="eyebrow">Integrated analysis</div><h1>Research Explorer</h1>
+  <p>Submit one abstract or document and run classification, biomedical entity extraction and summarization together. You receive one unified report that can be exported.</p></div>
+
+<form method="post" enctype="multipart/form-data" data-process="Analysing document">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="grid asym">
+    <div>{% include 'components/_input.html' %}</div>
+    <div class="panel sunken">
+      <div class="label">Analyses to run</div>
+      <div class="checks" style="flex-direction:column;gap:10px;margin-bottom:20px">
+        <label class="check"><input type="checkbox" name="steps" value="classify" data-label="Classifying sentence roles" checked> Sentence-role classification</label>
+        <label class="check"><input type="checkbox" name="steps" value="ner" data-label="Extracting biomedical entities" checked> Biomedical entity extraction</label>
+        <label class="check"><input type="checkbox" name="steps" value="summarize" data-label="Generating summary" checked> Summarization</label>
+      </div>
+      <div class="field"><label for="cls_model">Classification model</label>
+        <select id="cls_model" name="cls_model">{% for o in cls_options %}<option value="{{ o.key }}" {{ 'selected' if o.default }}>{{ o.label }}{{ ' (deployed)' if o.default }}</option>{% else %}<option value="">No trained model found</option>{% endfor %}</select></div>
+      <div class="field"><label for="ner_model">Entity model</label>
+        <select id="ner_model" name="ner_model"><option value="biobert">BioBERT token classifier</option><option value="dictionary">Dictionary baseline</option></select></div>
+      <div class="field"><label for="length">Summary length</label>
+        <select id="length" name="length">{% for l in lengths %}<option value="{{ l }}" {{ 'selected' if l == default_length }}>{{ l.title() }}</option>{% endfor %}</select></div>
+      <button class="btn" type="submit">Run analysis</button>
+      <p class="small muted" style="margin-top:12px">Limit {{ '{:,}'.format(limits.chars) }} characters. Runs locally; a missing model disables only its own section.</p>
+    </div>
+  </div>
+</form>
+
+{% if analysis %}
+<hr class="rule">
+<div class="page-head" style="border:0;margin-bottom:0"><div class="eyebrow">Report #{{ analysis.id }} · {{ analysis.created_at }}</div><h2 style="font-size:1.9rem">{{ analysis.doc.title }}</h2></div>
+<div class="row" style="margin-bottom:8px">
+  <a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='pdf') }}">Export PDF</a>
+  <a class="btn ghost sm" href="{{ url_for('history_export', aid=analysis.id, fmt='txt') }}">Export TXT</a>
+  <span class="mono muted">processed in {{ '%.1f'|format(total_seconds) }} s</span>
+</div>
+{% include 'components/_report_body.html' %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{# Variable: n (ner result dict) #}
+{% set colors = {'Chemical': '#C4A46A', 'Disease': '#BD755A'} %}
+<div class="row" style="margin-bottom:14px"><span class="label" style="margin:0">Show:</span>
+  {% for t in ['Chemical', 'Disease'] %}<button type="button" class="toggle" data-toggle-ent="{{ t }}" aria-pressed="true"><i class="i-{{ t }}"></i>{{ t }} <span class="mono">{{ n.category_counts.get(t, 0) }}</span></button>{% endfor %}
+</div>
+<div class="doc" data-ents>{% for text, typ, conf in n.segments %}{% if typ %}<mark class="ent {{ typ }}" data-key="{{ text|lower }}|{{ typ }}" title="{{ typ }}{% if conf is not none %} · confidence {{ '%.2f'|format(conf) }} (uncalibrated){% endif %}">{{ text }}<sup>{{ typ[0] }}</sup></mark>{% else %}{{ text }}{% endif %}{% endfor %}</div>
+{% if n.truncated %}<p class="notice" style="margin-top:12px">Only the first 20,000 characters were analysed.</p>{% endif %}
+<div class="grid g2" style="margin-top:34px">
+  <div><div class="label">Entity frequency</div>
+    {% if n.frequency %}<div class="tablewrap"><table><thead><tr><th>Entity</th><th>Type</th><th class="n">Count</th></tr></thead><tbody>
+      {% for f in n.frequency[:25] %}<tr data-ent="{{ f.entity }}|{{ f.type }}" class="clk"><td>{{ f.entity }}</td><td><span class="chip" style="color:{{ colors[f.type] }}">{{ f.type }}</span></td><td class="n">{{ f.count }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="muted">No chemical or disease entities were found.</p>{% endif %}</div>
+  <div><div class="label">Category distribution</div>
+    {% set cl = [] %}{% for k in n.category_counts %}{% set _ = cl.append(colors[k]) %}{% endfor %}
+    {% set cfg = {"type": "doughnut", "data": {"labels": n.category_counts.keys()|list, "datasets": [{"data": n.category_counts.values()|list, "backgroundColor": cl, "borderWidth": 0}]}, "options": {"cutout": "62%", "plugins": {"legend": {"position": "right"}}}} %}
+    <div class="chartbox short"><canvas data-config="{{ cfg|tojson|forceescape }}" aria-label="Entity category distribution" role="img"></canvas></div>
+    <dl class="kv" style="margin-top:14px"><dt>Model</dt><dd>{{ n.model }}</dd><dt>Entities found</dt><dd>{{ n.n_entities }}</dd><dt>Confidence</dt><dd>{{ 'mean softmax per entity (uncalibrated)' if n.has_confidence else 'n/a (dictionary baseline)' }}</dd></dl>
+    <p class="small muted">Hover an entity for its type and confidence. Categories follow BC5CDR (Chemical, Disease); they are model predictions, not clinical findings.</p></div>
+</div>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <div class="eyebrow">Healthcare research analytics · runs on your machine</div>
+  <h1>Medical research, <em>made legible.</em></h1>
+  <p class="lede">MediScope reads a research abstract or paper and shows you its structure, the chemicals and diseases it mentions, and a short machine-generated summary — with the evidence for every output laid open. It is a research instrument, not a clinical tool.</p>
+  <div class="row" style="margin-top:22px"><a class="btn" href="{{ url_for('explorer') }}">Analyse a document</a><a class="btn ghost" href="{{ url_for('laboratory') }}">See the experiments</a></div>
+</section>
+
+{% if fact %}<div class="fact" style="margin-bottom:44px"><div class="eyebrow" style="margin-bottom:4px">Research fact of the day · from the datasets used here</div>{{ fact }}</div>{% endif %}
+
+<div class="section" style="margin-top:0"><h2>Model statistics <small>from the experiment notebooks</small></h2>
+  <div class="grid g4">
+    <div class="stat"><div class="v">{{ deployed.f1_macro|num(3) if deployed else 'n/a' }}</div><div class="l">Classifier macro-F1</div><div class="s">{{ deployed.label if deployed else 'run notebooks 04–06, 10' }}</div></div>
+    <div class="stat"><div class="v">{{ ner.entity_level.f1|num(3) if ner else 'n/a' }}</div><div class="l">Entity-level F1 (BioBERT NER)</div><div class="s">{% if ner %}trained on {{ ner.train_n }} sentences{% else %}run notebook 07{% endif %}</div></div>
+    <div class="stat"><div class="v">{{ summ['ROUGE-1']|num(3) if summ else 'n/a' }}</div><div class="l">Summary ROUGE-1</div><div class="s">{% if summ %}T5-small, small test sample{% else %}run notebook 08{% endif %}</div></div>
+    <div class="stat"><div class="v">{{ '{:,}'.format(dataset.pubmed_rct.splits.train.sentences) if dataset else 'n/a' }}</div><div class="l">PubMed RCT training sentences</div><div class="s">{% if dataset %}{{ '{:,}'.format(dataset.pubmed_rct.splits.train.abstracts) }} abstracts{% endif %}</div></div>
+  </div>
+  <p class="small muted" style="margin-top:12px">Scores are measured on held-out test data under a CPU-limited training budget; see the Model Laboratory for the full protocol and caveats.</p>
+</div>
+
+<div class="section"><h2>What it does</h2>
+  <div class="grid g4">
+    <div class="feature"><div class="n">01</div><h3>Abstract classifier</h3><p>Labels each sentence as background, objective, methods, results or conclusions, with score distributions and the terms behind each call.</p></div>
+    <div class="feature"><div class="n">02</div><h3>Entity extraction</h3><p>Highlights chemicals and diseases with BioBERT, with per-entity confidence and category statistics.</p></div>
+    <div class="feature"><div class="n">03</div><h3>Summarization studio</h3><p>Chunks long papers, summarises locally and puts the original beside the result.</p></div>
+    <div class="feature"><div class="n">04</div><h3>Research explorer</h3><p>All three at once in a single exportable report (PDF or TXT).</p></div>
+  </div>
+</div>
+
+<div class="grid asym section">
+  <div><h2 style="border-bottom:1px solid var(--line);padding-bottom:8px">Recent analyses</h2>
+    {% if recent %}<table><thead><tr><th>#</th><th>When</th><th>Module</th><th>Document</th><th class="n">Seconds</th></tr></thead><tbody>
+      {% for r in recent %}<tr><td class="mono"><a href="{{ url_for('history_view', aid=r.id) }}">{{ r.id }}</a></td><td class="mono">{{ r.created_at }}</td><td>{{ r.kind }}</td><td>{{ r.title[:60] }}</td><td class="n">{{ '%.1f'|format(r.seconds) }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="muted">No analyses yet. Try the Research Explorer with the built-in synthetic example.</p>{% endif %}</div>
+  <div><h2 style="border-bottom:1px solid var(--line);padding-bottom:8px">Activity</h2>
+    {% if timeline %}{% set mx = timeline|map(attribute='n')|max %}<div class="timeline" role="img" aria-label="Analyses per day">{% for d in timeline %}<div style="height:{{ (d.n / mx * 100)|round }}%" data-t="{{ d.d }}: {{ d.n }}"></div>{% endfor %}</div>
+      <p class="mono muted" style="margin-top:6px">{{ total }} analyses total · last {{ timeline|length }} active days</p>{% else %}<p class="muted">Your activity timeline appears after the first analysis.</p>{% endif %}
+    <div class="miles" style="margin-top:16px">{% for m in milestones %}<span class="mile {{ 'done' if m.done }}">{{ m.label }}</span>{% endfor %}</div>
+  </div>
+</div>
+{% endblock %}

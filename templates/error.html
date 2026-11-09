@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="errpage"><div class="code">{{ code }}</div><h1>{{ title }}</h1><p class="lede">{{ message }}</p>
+  <div class="row"><a class="btn" href="{{ url_for('index') }}">Back to overview</a><a class="btn ghost" href="javascript:history.back()">Go back</a></div></div>
+{% endblock %}
