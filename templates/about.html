@@ -8,14 +8,15 @@
   <div class="section" style="margin-top:0"><h2>Motivation</h2>
     <p>Medical abstracts are dense. Knowing which sentence states the aim, which reports the method and which carries the finding makes skimming faster; knowing which chemicals and diseases are discussed helps orient a reader; a short summary helps triage. MediScope combines these in one place and, more importantly, keeps the evidence for every output visible.</p></div>
   <div class="section"><h2>Architecture</h2>
-    <pre class="code">Browser ── HTML forms / Jinja2 pages ──► app.py (Flask)
-                                          │
-        ┌─────────────────┬───────────────┼────────────────┐
-   src/classification  src/ner      src/summarization   SQLite history
-   (sklearn·BiLSTM·    (BioBERT +   (T5 + TextRank)     (instance/history.db)
-    transformers)       dictionary)
-        └──────── shared src/preprocessing.py ───────────┘
-   artifacts/  ◄── written by notebooks 04–10 (models, metrics)</pre>
+    <div class="grid g3" style="gap:14px;margin-bottom:14px">
+      <div class="panel sunken"><h4>Browser</h4><p class="small muted" style="margin:0">HTML forms and Jinja2 pages (no API)</p></div>
+      <div class="panel"><h4>app.py · Flask</h4><p class="small muted" style="margin:0">routes, validation, CSRF, history, exports</p></div>
+      <div class="panel sunken"><h4>SQLite</h4><p class="small muted" style="margin:0">local report history</p></div></div>
+    <div class="grid g3" style="gap:14px;margin-bottom:14px">
+      <div class="panel"><h4>classification</h4><p class="small muted" style="margin:0">scikit-learn · BiLSTM · transformers</p></div>
+      <div class="panel"><h4>ner</h4><p class="small muted" style="margin:0">BioBERT + dictionary baseline</p></div>
+      <div class="panel"><h4>summarization</h4><p class="small muted" style="margin:0">T5 chunking + TextRank</p></div></div>
+    <div class="panel sunken"><h4>Shared <span class="mono">preprocessing</span> · <span class="mono">artifacts/</span> written by notebooks 04–10</h4><p class="small muted" style="margin:0">One preprocessing module serves both training and inference, so the two cannot drift apart.</p></div>
     <p>There is no REST API and no external service: pages are rendered on the server from form posts, and all inference happens in-process on this machine. Models are loaded once, lazily, and cached.</p></div>
   <div class="section"><h2>Methodology</h2>
     <ul>

@@ -69,10 +69,10 @@ def to_pdf(a: dict) -> bytes:
     from reportlab.lib.units import mm
     from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
-    ink, forest = colors.HexColor("#242723"), colors.HexColor("#344C3D")
+    ink, forest = colors.HexColor("#14282A"), colors.HexColor("#0E6B63")
     st = {
         "title": ParagraphStyle("t", fontName="Times-Bold", fontSize=22, leading=26, textColor=forest, spaceAfter=4),
-        "meta": ParagraphStyle("m", fontName="Courier", fontSize=8, leading=11, textColor=colors.HexColor("#77766D"), spaceAfter=6),
+        "meta": ParagraphStyle("m", fontName="Helvetica", fontSize=8, leading=11, textColor=colors.HexColor("#5A6F6D"), spaceAfter=6),
         "h": ParagraphStyle("h", fontName="Times-Bold", fontSize=14, leading=18, textColor=forest, spaceBefore=12, spaceAfter=4),
         "h2": ParagraphStyle("h2", fontName="Times-Italic", fontSize=11, leading=14, textColor=ink, spaceBefore=6, spaceAfter=2),
         "p": ParagraphStyle("p", fontName="Helvetica", fontSize=9.5, leading=13, textColor=ink, spaceAfter=3),

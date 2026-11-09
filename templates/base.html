@@ -15,7 +15,7 @@
 <div class="shell">
   {% set nav = [('index','Overview'),('explorer','Research Explorer'),('classifier','Abstract Classifier'),('ner','Entity Extraction'),('summarizer','Summarization Studio'),('laboratory','Model Laboratory'),('history','Research History'),('about','About')] %}
   <aside class="sidebar" id="sidebar" aria-label="Primary">
-    <a class="brand" href="{{ url_for('index') }}">Medi<span>Scope</span></a>
+    <a class="brand" href="{{ url_for('index') }}"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z"/></svg><span class="bt">Medi<span>Scope</span></span></a>
     <p class="tagline">Making medical research more understandable through intelligent text analytics.</p>
     <nav><ul class="nav">
       {% for ep, label in nav %}
@@ -46,6 +46,34 @@
       {% block content %}{% endblock %}
       <p class="disclaimer">MediScope is an educational research project. Predictions are uncalibrated model outputs and summaries are machine generated; nothing here is medical advice, a diagnosis or a verified fact.</p>
     </main>
+    <footer class="footer">
+      <div class="footer-in">
+        <div class="top">
+          <div>
+            <div class="fbrand"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6v7h7v6h-7v7H9v-7H2V9h7z"/></svg>MediScope</div>
+            <p class="ftag">Making medical research more understandable through intelligent text analytics.</p>
+            <div class="badges"><span class="badge">Runs 100% locally</span><span class="badge">No external APIs</span><span class="badge">Research use only</span></div>
+          </div>
+          <div><h4>Analyse</h4><ul>
+            <li><a href="{{ url_for('explorer') }}">Research Explorer</a></li><li><a href="{{ url_for('classifier') }}">Abstract Classifier</a></li>
+            <li><a href="{{ url_for('ner') }}">Entity Extraction</a></li><li><a href="{{ url_for('summarizer') }}">Summarization Studio</a></li></ul></div>
+          <div><h4>Research</h4><ul>
+            <li><a href="{{ url_for('laboratory') }}">Model Laboratory</a></li><li><a href="{{ url_for('history') }}">Research History</a></li>
+            <li><a href="{{ url_for('about') }}">Methodology &amp; limits</a></li><li><a href="https://github.com/TusharPatra26/MediScope/tree/main/notebooks" rel="noopener">The 10 notebooks</a></li></ul></div>
+          <div><h4>Built on</h4><ul>
+            <li>BioBERT · DistilBERT · BERT · T5</li><li>PubMed 20k RCT · BC5CDR</li><li>PyTorch · scikit-learn · Flask</li>
+            <li><a href="https://github.com/TusharPatra26/MediScope" rel="noopener">Source on GitHub</a></li></ul></div>
+        </div>
+        <div class="strip">
+          <div><b>3</b><span>public biomedical datasets</span></div><div><b>9+</b><span>models compared like-for-like</span></div>
+          <div><b>10</b><span>executed research notebooks</span></div><div><b>0</b><span>documents stored or sent anywhere</span></div>
+        </div>
+        <div class="legal">
+          <p><strong>Not medical advice.</strong> MediScope is an educational research project. Predictions are uncalibrated model outputs and summaries are machine generated and unverified; do not use it for diagnosis, treatment or any clinical decision, and do not enter patient data.</p>
+          <p>© {{ now_year }} TusharPatra26 · Fonts: Source Serif 4 &amp; IBM Plex Sans (OFL) · Chart.js (MIT)</p>
+        </div>
+      </div>
+    </footer>
   </div>
 </div>
 <div class="overlay" id="overlay" role="alert" aria-live="polite"><div class="box">

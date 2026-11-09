@@ -1,5 +1,5 @@
 {# Variable: n (ner result dict) #}
-{% set colors = {'Chemical': '#C4A46A', 'Disease': '#BD755A'} %}
+{% set colors = {'Chemical': '#D08A1E', 'Disease': '#B5324B'} %}
 <div class="row" style="margin-bottom:14px"><span class="label" style="margin:0">Show:</span>
   {% for t in ['Chemical', 'Disease'] %}<button type="button" class="toggle" data-toggle-ent="{{ t }}" aria-pressed="true"><i class="i-{{ t }}"></i>{{ t }} <span class="mono">{{ n.category_counts.get(t, 0) }}</span></button>{% endfor %}
 </div>

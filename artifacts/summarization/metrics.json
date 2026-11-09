@@ -1,0 +1,78 @@
+{
+  "n_docs": 15,
+  "systems": {
+    "Lead-k": {
+      "ROUGE-1": 0.34005,
+      "ROUGE-2": 0.1047,
+      "ROUGE-L": 0.17578,
+      "avg summary words": 252.2,
+      "s / doc": 0.0,
+      "BERTScore-F1": 0.77314
+    },
+    "TextRank": {
+      "ROUGE-1": 0.40137,
+      "ROUGE-2": 0.16282,
+      "ROUGE-L": 0.23002,
+      "avg summary words": 239.66667,
+      "s / doc": 0.13359,
+      "BERTScore-F1": 0.80303
+    },
+    "T5-small base": {
+      "ROUGE-1": 0.1583,
+      "ROUGE-2": 0.0519,
+      "ROUGE-L": 0.11539,
+      "avg summary words": 37.53333,
+      "s / doc": 27.491,
+      "BERTScore-F1": 0.75032
+    },
+    "T5-small medical": {
+      "ROUGE-1": 0.30764,
+      "ROUGE-2": 0.11499,
+      "ROUGE-L": 0.19435,
+      "avg summary words": 82.06667,
+      "s / doc": 35.29494,
+      "BERTScore-F1": 0.78615
+    }
+  },
+  "factual_proxies": {
+    "Lead-k": {
+      "number support rate": 1.0,
+      "summaries with numbers": 14.0,
+      "novel content-word rate": 0.0
+    },
+    "TextRank": {
+      "number support rate": 1.0,
+      "summaries with numbers": 15.0,
+      "novel content-word rate": 0.0
+    },
+    "T5-small base": {
+      "number support rate": 1.0,
+      "summaries with numbers": 9.0,
+      "novel content-word rate": 0.01545
+    },
+    "T5-small medical": {
+      "number support rate": 1.0,
+      "summaries with numbers": 10.0,
+      "novel content-word rate": 0.07468
+    }
+  },
+  "length_control": {
+    "short": {
+      "mean words": 41.625,
+      "ROUGE-1 vs abstract": 0.1951
+    },
+    "medium": {
+      "mean words": 79.75,
+      "ROUGE-1 vs abstract": 0.289
+    },
+    "long": {
+      "mean words": 108.125,
+      "ROUGE-1 vs abstract": 0.3488
+    }
+  },
+  "bertscore_note": "BERTScore uses `distilbert-base-uncased` (layer 5) instead of the usual roberta-large (1.4 GB) to stay laptop-feasible, so values are **not comparable with published BERTScore numbers**.",
+  "protocol": "15 PubMed-summarization test articles; abstractive systems read first 3 chunks (<=512 tokens each)",
+  "model_params_m": 60.506624,
+  "model_mb": 242.041896,
+  "finetuned_here": false
+}

@@ -1,0 +1,132 @@
+{
+  "biobert": {
+    "kind": "ner-transformer",
+    "label": "BioBERT NER",
+    "train_n": 1000,
+    "epochs": 2,
+    "train_seconds": 2079.583839416504,
+    "inference_seconds_for_test_subset": 153.93450689315796,
+    "test_n": 1000,
+    "params": 107723525,
+    "model_mb": 430.917436,
+    "latency_ms_per_sentence": 153.93450689315796,
+    "entity_level": {
+      "precision": 0.8327759197324415,
+      "recall": 0.8686046511627907,
+      "f1": 0.8503130335799658,
+      "n_gold": 1720,
+      "n_pred": 1794,
+      "per_type": {
+        "Chemical": {
+          "precision": 0.9070021881838074,
+          "recall": 0.9070021881838074,
+          "f1": 0.9070021881838074,
+          "support": 914
+        },
+        "Disease": {
+          "precision": 0.7556818181818182,
+          "recall": 0.825062034739454,
+          "f1": 0.7888493475682087,
+          "support": 806
+        }
+      }
+    },
+    "token_accuracy": 0.9700991609458429,
+    "error_breakdown": {
+      "exact": 1494,
+      "spurious (false positive)": 172,
+      "boundary error (right type)": 104,
+      "missed": 116,
+      "wrong type": 6
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "train_loss": 0.40372957123650444,
+        "dev_loss": 0.08964738247572802,
+        "elapsed_s": 1149.2583117485046
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.07359881410818725,
+        "dev_loss": 0.06992246108917786,
+        "elapsed_s": 2078.763485431671
+      }
+    ]
+  },
+  "dictionary": {
+    "kind": "ner-baseline",
+    "label": "Dictionary (train+dev)",
+    "entity_level": {
+      "precision": 0.8727365467992859,
+      "recall": 0.6977265776327862,
+      "f1": 0.7754801427681152,
+      "n_gold": 9809,
+      "n_pred": 7842,
+      "per_type": {
+        "Chemical": {
+          "precision": 0.940095645607853,
+          "recall": 0.6935933147632312,
+          "f1": 0.7982474887796537,
+          "support": 5385
+        },
+        "Disease": {
+          "precision": 0.8035668131300078,
+          "recall": 0.7027576853526221,
+          "f1": 0.7497889786566985,
+          "support": 4424
+        }
+      }
+    },
+    "entity_level_on_subset": {
+      "precision": 0.8775811209439528,
+      "recall": 0.6918604651162791,
+      "f1": 0.773732119635891,
+      "n_gold": 1720,
+      "n_pred": 1356,
+      "per_type": {
+        "Chemical": {
+          "precision": 0.9392592592592592,
+          "recall": 0.6936542669584245,
+          "f1": 0.7979861548143486,
+          "support": 914
+        },
+        "Disease": {
+          "precision": 0.8164464023494861,
+          "recall": 0.6898263027295285,
+          "f1": 0.7478143913920646,
+          "support": 806
+        }
+      }
+    },
+    "train_n": 10558,
+    "lexicon_size": 3707
+  },
+  "dictionary_1k": {
+    "kind": "ner-baseline",
+    "label": "Dictionary (same 1k sentences)",
+    "entity_level_on_subset": {
+      "precision": 0.8576122672508215,
+      "recall": 0.4552325581395349,
+      "f1": 0.594758830231675,
+      "n_gold": 1720,
+      "n_pred": 913,
+      "per_type": {
+        "Chemical": {
+          "precision": 0.9599109131403119,
+          "recall": 0.47155361050328226,
+          "f1": 0.6324284666177549,
+          "support": 914
+        },
+        "Disease": {
+          "precision": 0.7586206896551724,
+          "recall": 0.43672456575682383,
+          "f1": 0.5543307086614173,
+          "support": 806
+        }
+      }
+    },
+    "train_n": 1000,
+    "lexicon_size": 910
+  }
+}

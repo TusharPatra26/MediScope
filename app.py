@@ -195,7 +195,7 @@ def create_app() -> Flask:
         if "csrf" not in session:
             session["csrf"] = secrets.token_hex(16)
         return {
-            "csrf_token": session["csrf"], "status": system_status(), "CLASS_LABELS": config.CLASS_LABELS,
+            "csrf_token": session["csrf"], "status": system_status(), "CLASS_LABELS": config.CLASS_LABELS, "now_year": date.today().year,
             "limits": {"mb": config.MAX_UPLOAD_BYTES // (1024 * 1024), "chars": config.MAX_TEXT_CHARS, "min": config.MIN_TEXT_CHARS},
             "lengths": list(config.SUM_LENGTHS), "default_length": config.SUM_DEFAULT_LENGTH,
         }

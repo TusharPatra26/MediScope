@@ -1,7 +1,7 @@
 /* Chart.js helpers (vendored locally). Charts read colours from CSS variables so they follow the theme. */
 (function () {
   const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  const palette = () => [css("--forest"), css("--terracotta"), css("--ochre"), css("--sage"), css("--stone"), css("--charcoal")];
+  const palette = () => [css("--teal"), css("--crimson"), css("--amber"), css("--sage"), css("--slate"), css("--ink")];
   const roleColor = (l) => css("--r-" + l.toLowerCase());
   const registry = [];
 

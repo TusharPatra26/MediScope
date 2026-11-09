@@ -1,0 +1,86 @@
+{
+  "position_features": {
+    "text only": {
+      "accuracy": 0.8231,
+      "macro_f1": 0.7595
+    },
+    "position only": {
+      "accuracy": 0.6781,
+      "macro_f1": 0.5538
+    },
+    "text + position": {
+      "accuracy": 0.8772,
+      "macro_f1": 0.8251
+    }
+  },
+  "learning_curve_lr": [
+    {
+      "n_train": 1000,
+      "dev_macro_f1": 0.6191,
+      "dev_acc": 0.7117
+    },
+    {
+      "n_train": 5000,
+      "dev_macro_f1": 0.6992,
+      "dev_acc": 0.7745
+    },
+    {
+      "n_train": 20000,
+      "dev_macro_f1": 0.7342,
+      "dev_acc": 0.8041
+    },
+    {
+      "n_train": 60000,
+      "dev_macro_f1": 0.7562,
+      "dev_acc": 0.822
+    }
+  ],
+  "bilstm": {
+    "A random-init": {
+      "best_dev_macro_f1": 0.7304,
+      "final_train_acc": 0.791,
+      "final_dev_acc": 0.7935,
+      "seconds": 473.7009
+    },
+    "B word2vec-init": {
+      "best_dev_macro_f1": 0.7591,
+      "final_train_acc": 0.8477,
+      "final_dev_acc": 0.819,
+      "seconds": 391.1588
+    },
+    "C max_len=32": {
+      "best_dev_macro_f1": 0.726,
+      "final_train_acc": 0.788,
+      "final_dev_acc": 0.7883,
+      "seconds": 196.7185
+    },
+    "D dropout=0": {
+      "best_dev_macro_f1": 0.7268,
+      "final_train_acc": 0.8616,
+      "final_dev_acc": 0.7928,
+      "seconds": 413.8023
+    }
+  },
+  "transformer_hparams_distilbert_600": {
+    "base (lr 5e-5, bs 16, len 64)": {
+      "val_macro_f1": 0.3118,
+      "val_loss": 1.0215,
+      "seconds": 217.6279
+    },
+    "lr 2e-5": {
+      "val_macro_f1": 0.2769,
+      "val_loss": 1.3533,
+      "seconds": 255.0999
+    },
+    "batch 32": {
+      "val_macro_f1": 0.2917,
+      "val_loss": 1.2611,
+      "seconds": 210.2028
+    },
+    "max_len 32": {
+      "val_macro_f1": 0.3017,
+      "val_loss": 1.0679,
+      "seconds": 94.0
+    }
+  }
+}

@@ -7,13 +7,13 @@
 <div class="notice err">No benchmark found. Run <span class="mono">notebooks/04–06</span> and then <span class="mono">10_model_benchmarking.ipynb</span> to create <span class="mono">artifacts/evaluation/benchmark.json</span>.</div>
 {% else %}
 {% set rows = bench.rows|sort(attribute='macro_f1', reverse=true) %}
-{% set famcolor = {'classical': '#344C3D', 'deep learning': '#BD755A', 'transformer': '#C4A46A'} %}
+{% set famcolor = {'classical': '#0E6B63', 'deep learning': '#B5324B', 'transformer': '#D08A1E'} %}
 
 <div class="section" style="margin-top:0"><h2>Leaderboard <small>shared stratified test subset · n = {{ bench.n_test }} sentences · bootstrap 95% CI</small></h2>
   {% if deployed %}<div class="notice ok"><strong>Deployed model:</strong> {{ deployed.label }}. {{ deployed.rationale }}</div>{% endif %}
   <div class="tablewrap"><table>
     <thead><tr><th>Model</th><th>Family</th><th class="n">Train n</th><th class="n">Macro-F1</th><th class="n">95% CI</th><th class="n">Weighted-F1</th><th class="n">Accuracy</th><th class="n">Macro-P</th><th class="n">Macro-R</th><th class="n">Train s</th><th class="n">ms / sent</th><th class="n">MB</th></tr></thead>
-    <tbody>{% for r in rows %}<tr class="{{ 'best' if deployed and deployed.name == r.key }}"><td>{{ r.label }}{% if deployed and deployed.name == r.key %} <span class="chip" style="color:var(--forest)">deployed</span>{% endif %}</td><td>{{ r.family }}</td>
+    <tbody>{% for r in rows %}<tr class="{{ 'best' if deployed and deployed.name == r.key }}"><td>{{ r.label }}{% if deployed and deployed.name == r.key %} <span class="chip" style="color:var(--teal)">deployed</span>{% endif %}</td><td>{{ r.family }}</td>
       <td class="n">{{ '{:,}'.format(r.train_n) }}</td><td class="n"><strong>{{ '%.4f'|format(r.macro_f1) }}</strong></td><td class="n">{{ '%.3f'|format(r.ci_lo) }}–{{ '%.3f'|format(r.ci_hi) }}</td><td class="n">{{ '%.4f'|format(r.weighted_f1) }}</td><td class="n">{{ '%.4f'|format(r.accuracy) }}</td>
       <td class="n">{{ '%.3f'|format(r.precision_macro) }}</td><td class="n">{{ '%.3f'|format(r.recall_macro) }}</td><td class="n">{{ '%.0f'|format(r.train_seconds) }}</td><td class="n">{{ '%.2f'|format(r.latency_ms) }}</td><td class="n">{{ '%.1f'|format(r.model_mb) }}</td></tr>{% endfor %}</tbody></table></div>
   <p class="small muted" style="margin-top:10px"><strong>Read with care:</strong> training budgets differ (see “Train n”). Classical NB/LR/SVM saw the full training set, the transformers a small CPU-feasible subset, so the table compares <em>deployable systems</em>, not architectures. Latency was measured on a shared CPU and is best used as a relative indicator.</p></div>
