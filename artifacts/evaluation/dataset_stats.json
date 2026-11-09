@@ -1,0 +1,70 @@
+{
+  "pubmed_rct": {
+    "splits": {
+      "train": {
+        "sentences": 180040,
+        "abstracts": 15000
+      },
+      "dev": {
+        "sentences": 30212,
+        "abstracts": 2500
+      },
+      "test": {
+        "sentences": 30135,
+        "abstracts": 2500
+      }
+    },
+    "class_distribution_train": {
+      "BACKGROUND": 21727,
+      "OBJECTIVE": 13839,
+      "METHODS": 59353,
+      "RESULTS": 57953,
+      "CONCLUSIONS": 27168
+    },
+    "median_sentences_per_abstract": 12.0,
+    "canonical_order_share": 0.7871333333333334,
+    "label_conflict_strings": 44,
+    "abstracts_shared_across_splits": 0
+  },
+  "bc5cdr": [
+    {
+      "split": "train",
+      "sentences": 5228,
+      "tokens": 109322,
+      "chemical_mentions": 5203,
+      "disease_mentions": 4182,
+      "sentences_without_entity": 1313
+    },
+    {
+      "split": "dev",
+      "sentences": 5330,
+      "tokens": 108958,
+      "chemical_mentions": 5347,
+      "disease_mentions": 4244,
+      "sentences_without_entity": 1441
+    },
+    {
+      "split": "test",
+      "sentences": 5865,
+      "tokens": 116318,
+      "chemical_mentions": 5385,
+      "disease_mentions": 4424,
+      "sentences_without_entity": 1725
+    }
+  ],
+  "bc5cdr_unseen_test_mention_share": 0.5295116772823779,
+  "summarization_test": {
+    "articles": 6658,
+    "median_article_words": 2595.5,
+    "median_abstract_words": 213.0
+  },
+  "facts": [
+    "The median randomized-trial abstract in PubMed 20k RCT has 12 sentences.",
+    "Methods sentences make up 33.0% of the training corpus \u2014 the most common rhetorical role.",
+    "Only 7.7% of sentences state the study objective (objective), the rarest role.",
+    "79% of abstracts present their sentences in the canonical Background\u2192Objective\u2192Methods\u2192Results\u2192Conclusions order.",
+    "53% of distinct chemical/disease mentions in the BC5CDR test set never appear in the training data.",
+    "BC5CDR training sentences contain 5,203 chemical and 4,182 disease mentions.",
+    "A typical article in the PubMed summarization benchmark has about 2,596 words but its abstract only 213."
+  ]
+}

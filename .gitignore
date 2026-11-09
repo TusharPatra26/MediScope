@@ -218,3 +218,24 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ==========================================
+# MediScope specifics
+# ==========================================
+# Raw / processed datasets are never committed (see data/README.md)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+# Model weights are large; small metrics/figures in artifacts/ ARE committed
+artifacts/**/*.pt
+artifacts/**/*.pth
+artifacts/**/*.joblib
+artifacts/**/*.safetensors
+artifacts/**/*.bin
+artifacts/**/checkpoints/
+# Uploaded documents / local DB
+instance/*
+!instance/.gitkeep
+uploads_tmp/
+.env
