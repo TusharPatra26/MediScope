@@ -184,12 +184,13 @@ def hero_demo():
     try:
         t0 = time.perf_counter()
         sents = split_sentences(DEMO_TEXT)
-        res = clf_mod.classify_sentences(sents)
+        name = clf_mod.deployed_name() or next(iter(clf_mod.available_models()), None)
+        res = clf_mod.classify_sentences(sents, name)
         rows = []
         for r in res:
             n = recognise(r["text"], "biobert")
             rows.append({"label": r["label"], "score": r["score"], "segments": n["segments"]})
-        _DEMO["v"] = {"rows": rows, "model": clf_mod.get_classifier().info()["name"], "seconds": time.perf_counter() - t0,
+        _DEMO["v"] = {"rows": rows, "model": clf_mod.get_classifier(name).info()["name"], "seconds": time.perf_counter() - t0,
                       "n_entities": sum(1 for x in rows for s in x["segments"] if s[1]), "counts": Counter(r["label"] for r in rows)}
     except Exception:  # missing artifacts or any failure -> the overview shows a plain note
         _DEMO["v"] = None
