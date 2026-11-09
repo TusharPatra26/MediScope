@@ -160,6 +160,21 @@ python app.py                    # http://127.0.0.1:5000
 ```
 Models are preloaded in a background thread. If an artifact is missing, the relevant page says which notebook to run.
 
+## Deploying on Render
+`gunicorn` is in `requirements.txt`. Create a **Web Service** from this repo with:
+
+| Setting | Value |
+|---|---|
+| Build command | `pip install -r requirements.txt` |
+| Start command | `gunicorn app:app --workers 1 --threads 4 --timeout 180 --bind 0.0.0.0:$PORT` |
+| Environment | `PYTHON_VERSION=3.12.7`, `MEDISCOPE_SECRET_KEY=<random string>` |
+
+Notes (be aware before deploying):
+* **Model weights are not in Git**, so a fresh deployment has no trained models: the pages that need one show a message naming the notebook that creates it (nothing is faked). To serve real predictions, provide the `artifacts/` model files on the instance (e.g. a Render persistent disk or a build step that downloads them) after running the notebooks.
+* `torch` and the transformers are large; the free 512 MB instance cannot hold BioBERT. Use a paid instance, or serve only the classical models (`artifacts/classification/models/*.joblib`).
+* One worker keeps a single copy of each model in memory; the history database (`instance/history.db`) is ephemeral on Render unless you attach a disk.
+* gunicorn runs on Linux/macOS only; on Windows use `python app.py`.
+
 ## Testing
 ```bash
 python -m pytest -q
@@ -168,7 +183,7 @@ Tests cover preprocessing, validation, uploads (valid/invalid/empty/oversized/fa
 
 ## Project structure
 ```
-app.py  config.py  requirements.txt  PROJECT_STATUS.md
+app.py  config.py  requirements.txt
 data/            README.md (provenance); raw/ processed/ are git-ignored
 notebooks/       01 … 10 (executed)
 src/             data · preprocessing · features · classification · ner · summarization ·
@@ -179,7 +194,6 @@ static/          css/ js/ (+ vendored Chart.js) fonts/
 tests/           test_preprocessing · test_models · test_app
 instance/        history.db, log (git-ignored)
 ```
-`PROJECT_STATUS.md` tracks phases, files, training status, tests and known issues.
 
 ## Limitations
 Sentences are classified in isolation (a position-aware ablation shows how much that costs); scores are uncalibrated; transformer/NER budgets are small; summaries can hallucinate (a proxy check is reported, not a guarantee); randomized-trial abstracts only; PDFs must contain extractable text; benchmark latencies were measured on a shared CPU; single seeds, so small differences are within noise.
