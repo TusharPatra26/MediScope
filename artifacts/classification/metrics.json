@@ -2252,5 +2252,225 @@
       "RESULTS",
       "CONCLUSIONS"
     ]
+  },
+  "bert": {
+    "kind": "transformer",
+    "label": "BERT-base",
+    "train_n": 3001,
+    "epochs": 1,
+    "train_seconds": 1157.4502582550049,
+    "params": 109486085,
+    "model_mb": 437.967852,
+    "latency_ms": 84.40646406234009,
+    "peak_rss_mb": 587.907072,
+    "eval_seconds": 155.47815251350403,
+    "cfg": {
+      "train_n": 3000,
+      "epochs": 1,
+      "batch_size": 16,
+      "lr": 5e-05,
+      "max_len": 64,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.1,
+      "grad_clip": 1.0,
+      "eval_every": 40,
+      "dev_n": 300
+    },
+    "test_full": null,
+    "best_val_macro_f1": 0.7621115704192816,
+    "accuracy": 0.809,
+    "n": 2000,
+    "precision_macro": 0.7618822988677229,
+    "recall_macro": 0.7407893479258416,
+    "f1_macro": 0.7482167162219132,
+    "precision_weighted": 0.8093950644459683,
+    "recall_weighted": 0.809,
+    "f1_weighted": 0.8078221865241427,
+    "per_class": {
+      "BACKGROUND": {
+        "precision": 0.6144578313253012,
+        "recall": 0.6375,
+        "f1": 0.6257668711656442,
+        "support": 240
+      },
+      "OBJECTIVE": {
+        "precision": 0.7391304347826086,
+        "recall": 0.5483870967741935,
+        "f1": 0.6296296296296297,
+        "support": 155
+      },
+      "METHODS": {
+        "precision": 0.8808823529411764,
+        "recall": 0.9117199391171994,
+        "f1": 0.8960359012715033,
+        "support": 657
+      },
+      "RESULTS": {
+        "precision": 0.8795562599049128,
+        "recall": 0.8604651162790697,
+        "f1": 0.8699059561128527,
+        "support": 645
+      },
+      "CONCLUSIONS": {
+        "precision": 0.6953846153846154,
+        "recall": 0.7458745874587459,
+        "f1": 0.7197452229299363,
+        "support": 303
+      }
+    },
+    "confusion_matrix": [
+      [
+        153,
+        27,
+        11,
+        3,
+        46
+      ],
+      [
+        44,
+        85,
+        9,
+        2,
+        15
+      ],
+      [
+        20,
+        3,
+        599,
+        31,
+        4
+      ],
+      [
+        3,
+        0,
+        53,
+        555,
+        34
+      ],
+      [
+        29,
+        0,
+        8,
+        40,
+        226
+      ]
+    ],
+    "labels": [
+      "BACKGROUND",
+      "OBJECTIVE",
+      "METHODS",
+      "RESULTS",
+      "CONCLUSIONS"
+    ]
+  },
+  "biobert": {
+    "kind": "transformer",
+    "label": "BioBERT v1.1",
+    "train_n": 3001,
+    "epochs": 1,
+    "train_seconds": 1129.3113989830017,
+    "params": 108314117,
+    "model_mb": 433.279996,
+    "latency_ms": 60.047658593930464,
+    "peak_rss_mb": 584.138752,
+    "eval_seconds": 124.89523410797119,
+    "cfg": {
+      "train_n": 3000,
+      "epochs": 1,
+      "batch_size": 16,
+      "lr": 5e-05,
+      "max_len": 64,
+      "weight_decay": 0.01,
+      "warmup_ratio": 0.1,
+      "grad_clip": 1.0,
+      "eval_every": 40,
+      "dev_n": 300
+    },
+    "test_full": null,
+    "best_val_macro_f1": 0.8188035612643537,
+    "accuracy": 0.8575,
+    "n": 2000,
+    "precision_macro": 0.8024098566097552,
+    "recall_macro": 0.7984511280516905,
+    "f1_macro": 0.7986291438019042,
+    "precision_weighted": 0.8588204301770691,
+    "recall_weighted": 0.8575,
+    "f1_weighted": 0.8566146714581002,
+    "per_class": {
+      "BACKGROUND": {
+        "precision": 0.7053571428571429,
+        "recall": 0.6583333333333333,
+        "f1": 0.6810344827586207,
+        "support": 240
+      },
+      "OBJECTIVE": {
+        "precision": 0.6857142857142857,
+        "recall": 0.6193548387096774,
+        "f1": 0.6508474576271186,
+        "support": 155
+      },
+      "METHODS": {
+        "precision": 0.9127906976744186,
+        "recall": 0.9558599695585996,
+        "f1": 0.9338289962825279,
+        "support": 657
+      },
+      "RESULTS": {
+        "precision": 0.9496644295302014,
+        "recall": 0.8775193798449612,
+        "f1": 0.9121676067687349,
+        "support": 645
+      },
+      "CONCLUSIONS": {
+        "precision": 0.7585227272727273,
+        "recall": 0.8811881188118812,
+        "f1": 0.815267175572519,
+        "support": 303
+      }
+    },
+    "confusion_matrix": [
+      [
+        158,
+        40,
+        9,
+        5,
+        28
+      ],
+      [
+        42,
+        96,
+        12,
+        2,
+        3
+      ],
+      [
+        5,
+        4,
+        628,
+        9,
+        11
+      ],
+      [
+        1,
+        0,
+        35,
+        566,
+        43
+      ],
+      [
+        18,
+        0,
+        4,
+        14,
+        267
+      ]
+    ],
+    "labels": [
+      "BACKGROUND",
+      "OBJECTIVE",
+      "METHODS",
+      "RESULTS",
+      "CONCLUSIONS"
+    ]
   }
 }

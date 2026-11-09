@@ -1,92 +1,69 @@
 # MediScope — Project Status
 
-_Last updated: Phase 1 (research & planning) complete. Everything below is updated at the end of each phase._
+_All phases complete. Numbers below come from the executed notebooks; nothing is estimated._
 
 ## 1. Phase tracker
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1 | Research, dataset/licence validation, model selection, architecture, risks | **Done** |
-| 2 | Data acquisition + notebooks 01-03 | Pending |
-| 3 | Shared preprocessing, classical ML, BiLSTM | Pending |
-| 4 | Transformer classifier, NER, summarization | Pending |
-| 5 | Notebooks 06-10, benchmarking, deployment model selection | Pending |
-| 6 | Flask backend, uploads, history, exports | Pending |
-| 7 | Frontend / design system | Pending |
-| 8 | Final verification, docs | Pending |
+| 1 | Research, dataset/licence validation, model selection, architecture, risks | Done |
+| 2 | Data acquisition + notebooks 01–03 | Done (executed) |
+| 3 | Shared preprocessing, classical ML, BiLSTM | Done (notebooks 04–05 executed) |
+| 4 | Transformer classifier, NER, summarization | Done (notebooks 06–08 executed) |
+| 5 | Explainability, benchmarking, deployment selection | Done (notebooks 09–10 executed) |
+| 6 | Flask backend, uploads, history, exports | Done |
+| 7 | Frontend / design system (clinical teal–crimson palette, sans + serif typography, footer) | Done |
+| 8 | Final verification, docs | Done — see test results |
 
-## 2. Datasets (verified 2026-11-09 by downloading and counting)
+## 2. Datasets (verified by downloading and counting)
 
-| Dataset | Task | Source | Verified counts | Licence status |
-|---|---|---|---|---|
-| **PubMed 20k RCT** (Dernoncourt & Lee, IJCNLP 2017) | Sentence-level rhetorical-role classification (BACKGROUND / OBJECTIVE / METHODS / RESULTS / CONCLUSIONS) | `github.com/Franck-Dernoncourt/pubmed-rct` (`PubMed_20k_RCT/`) | train 180,040 sentences / 15,000 abstracts; dev 30,212 / 2,500; test 30,135 / 2,500 | **No explicit licence.** Built from MEDLINE/PubMed 2016 baseline; the repo README states some abstracts may be protected by copyright and users must satisfy copyright terms. Used for research only; **never redistributed or committed**. |
-| **BC5CDR** (BioCreative V CDR, Li et al. 2016), T-NER sentence-split version | Chemical / Disease NER (BIO) | `huggingface.co/datasets/tner/bc5cdr` | train 5,228; dev 5,330; test 5,865 sentences | Hugging Face card lists `license: other`. Underlying corpus is from NCBI/BioCreative for research use. Not redistributed. |
-| **PubMed summarization** (Cohan et al. 2018) via `ccdv/pubmed-summarization` (`document` config, **test split only**, 58 MB) | Evaluate long-document summarization (article -> abstract) | `huggingface.co/datasets/ccdv/pubmed-summarization` | test 6,658 articles; median article ≈ 2,596 words, median abstract ≈ 213 words | Card declares **no licence**. Derived from PubMed Central Open Access. Used for evaluation only; not redistributed. The 2.2 GB train split is deliberately **not** downloaded. |
-
-**Design decision — what "research category" means.** PubMed 20k RCT labels the *role of each sentence inside an abstract*, not the topic of the whole abstract. MediScope therefore classifies **each sentence of a submitted abstract** into a rhetorical role and aggregates this into a per-abstract structure view. I am not relabelling it as topic classification, because that would misrepresent the data.
-
-**Leakage:** official splits are made per abstract, so no abstract spans two splits. Notebook 01 verifies this empirically. Hyper-parameter search uses `GroupKFold` on `abstract_id` so sentences of one abstract never straddle CV folds.
-
-## 3. Models
-
-| Task | Models | Notes |
+| Dataset | Verified counts | Licence status |
 |---|---|---|
-| Classification (classical) | MultinomialNB, Logistic Regression, Linear SVM, Random Forest, XGBoost on TF-IDF (word 1-2gram) | full 180k training sentences, CPU |
-| Classification (deep) | BiLSTM (PyTorch, learned embeddings; Word2Vec-initialised variant as an ablation) | CPU |
-| Classification (transformer) | DistilBERT (`distilbert-base-uncased`, Apache-2.0), BERT (`bert-base-uncased`, Apache-2.0), BioBERT (`dmis-lab/biobert-base-cased-v1.1`) | fine-tuned on a stratified 20k-sentence subset on CPU (see below) |
-| NER | Dictionary/rule baseline built from training-set mentions; BioBERT token classifier | BIO alignment to first subword, other subwords masked with -100 |
-| Summarization | Extractive TF-IDF/TextRank baseline; `Falconsai/medical_summarization` (T5-small, Apache-2.0, **pretrained only — not fine-tuned by me**) | evaluated with ROUGE (+ BERTScore if feasible) on a test subset |
+| PubMed 20k RCT | train 180,040 sentences / 15,000 abstracts; dev 30,212 / 2,500; test 30,135 / 2,500 | no explicit licence; MEDLINE-derived, some abstracts may be copyrighted; research use only |
+| BC5CDR (T-NER) | 5,228 / 5,330 / 5,865 sentences | hub card: "other" |
+| PubMed summarization (test split only) | 6,658 articles | none declared |
 
-**Licence caveat — BioBERT.** The Hugging Face card carries no licence field and the GitHub API does not auto-detect one for `dmis-lab/biobert`. I will cite the original paper (Lee et al., 2020) and flag this in the README rather than assert a licence.
+Not committed to Git; `python -m src.data` re-creates them. Full provenance: `data/README.md`. "Research category" = rhetorical role of each sentence (what PubMed RCT labels).
 
-## 4. Hardware reality check (measured)
+## 3. Model training status (CPU-only machine; budgets are small and stated)
 
-* CPU: Intel i5-1135G7 (4C/8T), RAM ≈ 7.8 GB.
-* GPU: NVIDIA MX450, **2 GB VRAM**; installed PyTorch is the **CPU-only** build (`torch 2.15.0+cpu`, `cuda.is_available() == False`).
-* Conclusion: BERT-base full fine-tuning on the whole dataset is not realistic locally. Compromises (documented, not hidden):
-  1. Transformers are fine-tuned on a **configurable stratified subset** (`TRAIN_SUBSET_SENTENCES`, default 8,000) with `max_seq_len=64`.
-  2. Transformers are evaluated on a **fixed stratified 5,000-sentence test subset**; classical/BiLSTM models are reported on both the full test set and the same subset so the comparison is like-for-like.
-  3. All notebook configs are single cells at the top; on Colab GPU set a larger subset and rerun.
-* I did **not** install a CUDA build of PyTorch (≈2.5 GB download, and 2 GB VRAM would still be too small for BERT-base AdamW).
+| Task | Model | Budget | Result |
+|---|---|---|---|
+| Classification | NB, LR, Linear SVM | all 180,040 sentences | macro-F1 0.743 / 0.771 / 0.789 |
+| Classification | RF, XGBoost, LR reference | 30,000 sentences | 0.694 / 0.690 / 0.747 |
+| Classification | BiLSTM | 30,000 sentences | 0.762 |
+| Classification | DistilBERT / BERT-base / **BioBERT** | 3,001 sentences, 1 epoch | 0.743 / 0.748 / **0.799** (deployed) |
+| NER | BioBERT token classifier | 1,000 sentences, 2 epochs | entity F1 0.850 (dictionary on same data 0.595; on all data 0.775) |
+| Summarization | `Falconsai/medical_summarization` (T5-small) | **pretrained only, not fine-tuned** | ROUGE-1 0.308 on 15 articles |
 
-## 5. Architecture (final, compact)
+All classification scores: shared 2,000-sentence test subset. Deployment rule and its post-hoc revision are documented in notebook 10.
 
-Follows the mandated layout. `src/` holds reusable logic shared by notebooks and the app; notebooks hold experiments; the Flask app is a single `app.py` with a small number of routes (blueprints only if it grows). Preprocessing is **one function used for both training and inference** (`src/preprocessing.py`).
+## 4. Deviations from the original brief (explained, not hidden)
 
-Additions to the suggested tree, each justified:
-* `static/js/vendor/` — Chart.js (MIT) vendored locally so the app is fully offline.
-* `data/README.md` — dataset provenance.
-* No Docker, Redis, Celery, extra DBs.
+* **Compute:** no CUDA PyTorch and a 2 GB GPU → transformers/NER trained on small subsets (configurable in `config.py`/notebook config cells); summarizer not fine-tuned.
+* **Hyper-parameter studies** for transformers are one-factor-at-a-time on a 600-sentence budget; epoch/large-batch sweeps were not run.
+* **Seeds:** single seed per experiment (3 → 2 seeds in notebook 03 for time); small differences are within noise.
+* **Latency** was measured while other notebooks ran on the same CPU; use it for relative ordering.
+* **BERTScore** uses `distilbert-base-uncased`, not roberta-large.
+* **BioBERT licence** is not machine-declared on its hub page; weights are not redistributed.
+* **Preprocessing:** the plain-lowercase `raw` strategy won notebook 03 and is what the classical models use (not the regex "clean").
+* **Classification label unit:** sentence role, not abstract topic.
 
-## 6. Technical risks and mitigations
+## 5. Test results
 
-| Risk | Mitigation |
-|---|---|
-| CPU-only training time | Subsets, short sequence length, dynamic padding, background runs, checkpointing |
-| 8 GB RAM | Sparse TF-IDF, capped features, no 180k x dense matrices; RF with limited trees/depth |
-| Transformer models loaded per request | Lazy singleton loader with a lock, loaded once per process |
-| Missing artifacts | Pages show exactly which notebook/command produces the artifact; **no mock predictions anywhere** |
-| Uncalibrated scores | UI labels softmax/SVM scores as uncalibrated; notebook 09 measures ECE |
-| Abstractive summaries can hallucinate | Extractive key sentences shown alongside; UI warning; notebook 08 includes a factual-consistency check (numeric/entity overlap) |
-| PDF extraction quality | pypdf text extraction, empty/scan-only PDFs rejected with a clear message |
-| Uploaded documents are sensitive | Processed in memory/temp file, deleted in `finally`; history stores only a short excerpt + results, not the file |
+`python -m pytest -q` → **49 passed** (≈2 min on CPU, with all trained models present: real BioBERT classification, BioBERT NER, T5 summarization, uploads, CSRF, history, PDF/TXT export). An earlier run caught two real bugs, both fixed: an empty-token CSRF bypass, and an upper-cased TXT export title.
 
-## 7. Files created so far
+## 6. Known issues
 
-`config.py`, `src/data.py`, `PROJECT_STATUS.md`, `static/fonts/*.woff2` (OFL-1.1), `static/js/vendor/chart.umd.min.js` (MIT).
+* The deployed BioBERT classifier takes ~60 ms/sentence on CPU; a 250-sentence document classifies in ~15 s, plus occlusion explanations for the first 8 sentences.
+* The NER model sometimes splits multi-word diseases (e.g. "low" + "back pain") — visible on the Overview specimen.
+* Summaries are unverified machine output; the extractive baselines beat T5 on ROUGE (expected for overlap metrics).
+* Transformer results are low-resource (1 epoch, ~1.7% of data) and not comparable with published full-data scores.
+* PDF extraction needs a text layer (no OCR).
 
-## 8. Model training status
+## 7. Final verification
 
-None trained yet.
-
-## 9. Dataset preparation status
-
-Raw data downloaded to `data/raw/` (gitignored) via `python -m src.data`. Counts verified (section 2).
-
-## 10. Test results
-
-No tests yet.
-
-## 11. Known issues
-
-* Torch is CPU-only; see section 4.
+* Full test suite: 49 passed.
+* App launched with `python app.py`; every page returns 200; Model Laboratory charts render from `artifacts/evaluation/benchmark.json`; Overview specimen is live BioBERT + NER output.
+* Notebooks 01–10 executed with the project venv kernel (Python 3.12.16).
+* Not done: responsive layouts were only spot-checked at desktop/tablet widths, not on a phone.

@@ -78,7 +78,50 @@ All ten notebooks are executed and contain their outputs; observations are compu
 * **Explainability.** Linear coefficients, occlusion, SHAP, LIME; attention is deliberately *not* used as explanation. No claim of medical causation.
 
 ## Evaluation results
-<!-- RESULTS -->
+All numbers come from the executed notebooks (`artifacts/*/metrics.json`, `benchmark.json`); single seed, CPU-only training. **Read the "Train n" column — budgets differ.**
+
+### Sentence-role classification (PubMed 20k RCT, shared 2,000-sentence test subset, bootstrap 95% CI)
+
+| Model | Family | Train n | Macro-F1 (95% CI) | Accuracy | Weighted-F1 | Train s | ms/sent | MB |
+|---|---|---|---|---|---|---|---|---|
+| **BioBERT v1.1** *(deployed)* | transformer | 3,001 | **0.799** (0.775–0.819) | 0.858 | 0.857 | 1129 | 60.05 | 433.3 |
+| Linear SVM | classical | 180,040 | 0.789 (0.765–0.811) | 0.843 | 0.840 | 48 | 0.13 | 9.3 |
+| Logistic Regression | classical | 180,040 | 0.771 (0.747–0.791) | 0.825 | 0.826 | 143 | 0.10 | 6.2 |
+| BiLSTM | deep learning | 30,000 | 0.762 (0.738–0.783) | 0.820 | 0.820 | 439 | 0.58 | 13.0 |
+| BERT-base | transformer | 3,001 | 0.748 (0.724–0.770) | 0.809 | 0.808 | 1157 | 84.41 | 438.0 |
+| Logistic Regression (30k) | classical | 30,000 | 0.747 (0.722–0.769) | 0.809 | 0.809 | 37 | 0.13 | 2.7 |
+| Naive Bayes | classical | 180,040 | 0.743 (0.718–0.765) | 0.808 | 0.806 | 35 | 0.17 | 10.2 |
+| DistilBERT | transformer | 3,001 | 0.743 (0.718–0.767) | 0.806 | 0.804 | 762 | 38.37 | 267.8 |
+| Random Forest | classical | 30,000 | 0.694 (0.666–0.717) | 0.760 | 0.755 | 97 | 0.20 | 31.8 |
+| Logistic Regression (3k, matched to transformers) | classical | 3,001 | 0.693 (0.668–0.714) | 0.757 | 0.757 | 3 | 0.11 | 0.3 |
+| XGBoost | classical | 30,000 | 0.690 (0.662–0.714) | 0.750 | 0.746 | 155 | 0.12 | 0.4 |
+
+* **Matched budget (3,001 sentences):** every transformer beats Logistic Regression (0.743–0.799 vs 0.693 macro-F1); the biomedical model (BioBERT) is best (+0.05 over BERT-base, though cased-vs-uncased is a confound). Transformers were fine-tuned for **one epoch** on ~1.7% of the training data.
+* **Statistics:** the top two (BioBERT vs Linear SVM) differ detectably in accuracy by McNemar (p = 0.045) although their bootstrap CIs overlap. Many neighbouring models have overlapping CIs at n = 2,000, so their ordering is unresolved.
+* **Deployment rule** (notebook 10): highest macro-F1 under latency ≤ 150 ms and size ≤ 600 MB, ties (paired McNemar p ≥ 0.05) → cheapest. This selected BioBERT. *(The rule was revised after seeing the first results, from CI-overlap to the paired test; the notebook documents this.)* The Linear SVM is ~460× faster and ~47× smaller and loses only ~0.01 macro-F1 — a reasonable alternative; every trained model is selectable in the app.
+* **Position matters** (notebook 04): Logistic Regression on text alone 0.760 macro-F1, position alone 0.554, text + position **0.825**. Sentence-only models leave much of the signal unused.
+* **Calibration** (notebook 09): scores are not probabilities — e.g. Logistic Regression is over-confident, the SVM's softmax-of-margins under-confident (ECE 0.248).
+* **Preprocessing** (notebook 03): the plain-lowercase `raw` strategy beat my regex "clean", stemming and stopword-removal strategies (stopword removal was clearly worst); (1,2)-gram TF-IDF beat unigrams by +0.022; TF-IDF beat averaged Word2Vec by +0.038.
+
+### Biomedical NER (BC5CDR, strict entity-level, 1,000-sentence test subset)
+
+| System | Train data | Precision | Recall | F1 |
+|---|---|---|---|---|
+| **BioBERT token classifier** | 1,000 sentences, 2 epochs | 0.833 | 0.869 | **0.850** |
+| Dictionary lookup | same 1,000 sentences | 0.858 | 0.455 | 0.595 |
+| Dictionary lookup | all train + dev (10.5k sentences) | 0.873 | 0.698 | 0.775 |
+
+### Summarization (15 PubMed-summarization test articles — small sample)
+
+| System | ROUGE-1 | ROUGE-2 | ROUGE-L | BERTScore-F1* | words |
+|---|---|---|---|---|---|
+| TextRank (extractive) | 0.401 | 0.163 | 0.230 | 0.803 | ~240 |
+| Lead-k (extractive) | 0.340 | 0.105 | 0.176 | 0.773 | ~252 |
+| T5-small medical (pretrained, abstractive) | 0.308 | 0.115 | 0.194 | 0.786 | ~82 |
+| T5-small base (zero-shot) | 0.158 | 0.052 | 0.115 | 0.750 | ~38 |
+
+\*BERTScore uses `distilbert-base-uncased` (not roberta-large), so it is not comparable with published values. The extractive baselines are ~3× longer than the abstractive summaries and ROUGE favours overlap; the medical T5 clearly beats the base T5 and numbers it states are mostly (≈92%) present in the source. The summarizer was **not fine-tuned** here, and the benchmark text is lower-cased/tokenised unlike pasted prose.
+
 
 ## Installation
 ```bash

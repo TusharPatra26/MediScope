@@ -50,7 +50,7 @@ def to_txt(a: dict) -> str:
     buf = []
     for style, text in _lines(a):
         if style == "title":
-            buf += [text.upper(), "=" * len(text)]
+            buf += [text, "=" * len(text)]
         elif style in ("h", "h2"):
             buf += ["", text, "-" * len(text)]
         elif style == "li":

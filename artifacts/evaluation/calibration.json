@@ -1,0 +1,68 @@
+{
+  "bert": {
+    "model": "BERT-base",
+    "ECE": 0.054153798773884786,
+    "accuracy": 0.809,
+    "mean confidence": 0.7817950248718262
+  },
+  "bilstm": {
+    "model": "BiLSTM",
+    "ECE": 0.027827736005187044,
+    "accuracy": 0.82,
+    "mean confidence": 0.8433514833450317
+  },
+  "biobert": {
+    "model": "BioBERT v1.1",
+    "ECE": 0.02750407661497593,
+    "accuracy": 0.8575,
+    "mean confidence": 0.841975748538971
+  },
+  "distilbert": {
+    "model": "DistilBERT",
+    "ECE": 0.04756559482216832,
+    "accuracy": 0.806,
+    "mean confidence": 0.7724615931510925
+  },
+  "tfidf_lr": {
+    "model": "Logistic Regression",
+    "ECE": 0.05475658667087553,
+    "accuracy": 0.8245,
+    "mean confidence": 0.8708710670471191
+  },
+  "tfidf_lr_30k": {
+    "model": "Logistic Regression (30k)",
+    "ECE": 0.0234571866542101,
+    "accuracy": 0.809,
+    "mean confidence": 0.8224126100540161
+  },
+  "tfidf_lr_8k": {
+    "model": "Logistic Regression (3k, transformer-matched)",
+    "ECE": 0.04851119299232961,
+    "accuracy": 0.757,
+    "mean confidence": 0.7142552733421326
+  },
+  "tfidf_nb": {
+    "model": "Naive Bayes",
+    "ECE": 0.03637808785587548,
+    "accuracy": 0.808,
+    "mean confidence": 0.8316702246665955
+  },
+  "tfidf_rf": {
+    "model": "Random Forest (30k)",
+    "ECE": 0.11121022579073907,
+    "accuracy": 0.7605,
+    "mean confidence": 0.6492897868156433
+  },
+  "tfidf_svm": {
+    "model": "Linear SVM",
+    "ECE": 0.24782984249293805,
+    "accuracy": 0.8425,
+    "mean confidence": 0.5946701765060425
+  },
+  "tfidf_xgb": {
+    "model": "XGBoost (30k)",
+    "ECE": 0.12451595000922677,
+    "accuracy": 0.7495,
+    "mean confidence": 0.624984085559845
+  }
+}

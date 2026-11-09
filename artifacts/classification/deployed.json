@@ -1,0 +1,6 @@
+{
+  "name": "biobert",
+  "label": "BioBERT v1.1",
+  "rationale": "Selected 'BioBERT v1.1': macro-F1 0.7986 (95% CI 0.775-0.819) on the shared 2,000-sentence test subset, 60.05 ms/sentence, 433.3 MB. Leader: 'BioBERT v1.1'. Models not detectably worse than the leader (paired McNemar p >= 0.05): ['BioBERT v1.1']; the cheapest of them was chosen. (By the more conservative CI-overlap criterion the tied group would be ['BioBERT v1.1', 'Linear SVM'].)",
+  "rule": "max macro-F1 under latency<=150ms & size<=600MB; ties (paired McNemar p>=0.05 vs leader) -> lowest latency"
+}
