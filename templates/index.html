@@ -1,11 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="hero">
-  <div class="eyebrow">Healthcare research analytics · runs on your machine</div>
-  <h1>Medical research, <em>made legible.</em></h1>
-  <p class="lede">MediScope reads a research abstract or paper and shows you its structure, the chemicals and diseases it mentions, and a short machine-generated summary — with the evidence for every output laid open. It is a research instrument, not a clinical tool.</p>
-  <div class="row" style="margin-top:22px"><a class="btn" href="{{ url_for('explorer') }}">Analyse a document</a><a class="btn ghost" href="{{ url_for('laboratory') }}">See the experiments</a></div>
+<section class="intro">
+  <div class="intro-copy">
+    <div class="eyebrow">Healthcare research analytics · runs on your machine</div>
+    <h1>Every study has a structure. <span class="under">See it in seconds.</span></h1>
+    <p class="lede">Paste an abstract or upload a paper. MediScope marks the role of each sentence, flags the chemicals and diseases, and drafts a short summary — and shows you the evidence behind every mark.</p>
+    <div class="row" style="margin-top:22px"><a class="btn" href="{{ url_for('explorer') }}">Analyse a document</a><a class="btn ghost" href="{{ url_for('laboratory') }}">See the experiments</a></div>
+    <ul class="vitals" aria-label="Key properties">
+      <li><b>5</b><span>sentence roles</span></li><li><b>2</b><span>entity types</span></li><li><b>0</b><span>files leave your computer</span></li>
+    </ul>
+  </div>
+  <figure class="sheet" aria-label="Example annotated abstract">
+    <div class="sheet-head">
+      <span class="sheet-id">SPECIMEN · synthetic example abstract</span>
+      <svg class="pulse" viewBox="0 0 160 24" aria-hidden="true"><path d="M0 12h40l6-9 8 18 7-12 5 3h94" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    </div>
+    {% if demo %}
+    <div class="sheet-filter" role="group" aria-label="Filter by sentence role">
+      {% for l in CLASS_LABELS %}{% if demo.counts[l] %}<button type="button" class="rolebtn role-{{ l }}" data-role="{{ l }}" aria-pressed="true">{{ l.title() }} · {{ demo.counts[l] }}</button>{% endif %}{% endfor %}
+    </div>
+    <ol class="sheet-body">
+      {% for r in demo.rows %}
+      <li data-role="{{ r.label }}"><span class="tag bg-{{ r.label }}" title="{{ r.label }} · {{ '%.0f'|format(r.score*100) }}% (uncalibrated)">{{ r.label[:4] }}</span>
+        <p>{% for text, typ, conf in r.segments %}{% if typ %}<mark class="ent {{ typ }}" title="{{ typ }}{% if conf is not none %} · {{ '%.2f'|format(conf) }}{% endif %}">{{ text }}</mark>{% else %}{{ text }}{% endif %}{% endfor %}</p></li>
+      {% endfor %}
+    </ol>
+    <div class="sheet-foot"><span><i class="i-Chemical"></i>Chemical</span><span><i class="i-Disease"></i>Disease</span>
+      <span class="grow">{{ demo.n_entities }} entities · roles by {{ demo.model }} · {{ '%.1f'|format(demo.seconds) }} s on this CPU</span></div>
+    {% else %}
+    <div class="sheet-body" style="padding:22px"><p class="muted" style="margin:0">The live example appears here once the classifier and NER models are trained (see the notebooks). Nothing is simulated.</p></div>
+    {% endif %}
+  </figure>
 </section>
+
 
 {% if fact %}<div class="fact" style="margin-bottom:44px"><div class="eyebrow" style="margin-bottom:4px">Research fact of the day · from the datasets used here</div>{{ fact }}</div>{% endif %}
 

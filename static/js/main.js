@@ -101,6 +101,13 @@
     const first = srcs.find((x) => x.classList.contains("hit")); if (first) first.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }));
 
+  /* ---- overview specimen: filter sentences by role ---- */
+  $$(".rolebtn").forEach((b) => b.addEventListener("click", () => {
+    b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true");
+    const on = new Set($$(".rolebtn[aria-pressed=true]").map((x) => x.dataset.role));
+    $$(".sheet-body li").forEach((li) => li.classList.toggle("dim", !on.has(li.dataset.role)));
+  }));
+
   /* ---- confirm destructive actions ---- */
   $$("form[data-confirm]").forEach((f) => f.addEventListener("submit", (e) => { if (!confirm(f.dataset.confirm)) e.preventDefault(); }));
 })();

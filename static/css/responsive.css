@@ -5,6 +5,7 @@
   .g4 { grid-template-columns: repeat(2, 1fr); } .asym { gap: 32px; } .hero h1 { font-size: 2.8rem; }
 }
 @media (max-width: 900px) {
+  .intro { grid-template-columns: 1fr; gap: 36px; } .intro h1 { font-size: 2.2rem; }
   .footer .top { grid-template-columns: 1fr 1fr; } .footer .top > :first-child { grid-column: 1 / -1; } .footer .strip { grid-template-columns: 1fr 1fr; } .footer .strip div:nth-child(3) { padding-left: 0; border-left: 0; }
   .shell { grid-template-columns: 1fr; }
   .sidebar { position: fixed; z-index: 30; width: 260px; transform: translateX(-102%); transition: transform .25s; box-shadow: 8px 0 30px -12px rgba(0,0,0,.35); }
@@ -14,6 +15,7 @@
   .detail { position: static; } .hero h1 { font-size: 2.4rem; }
 }
 @media (max-width: 600px) {
+  .intro h1 { font-size: 1.9rem; } .vitals { gap: 18px; } .sheet-foot .grow { margin-left: 0; }
   .footer-in { padding: 36px 16px 20px; } .footer .top { grid-template-columns: 1fr; gap: 28px; } .footer .strip { grid-template-columns: 1fr; } .footer .strip div + div { padding-left: 0; border-left: 0; border-top: 1px solid rgba(213,230,225,.2); }
   main { padding: 22px 16px 56px; } .topbar { padding: 10px 16px; } .status .txt { display: none; }
   .g2, .g4 { grid-template-columns: 1fr; } h1 { font-size: 1.8rem; } .hero h1 { font-size: 2rem; }

@@ -165,6 +165,38 @@ def read_input() -> tuple[str, str]:
 
 
 # ---------------------------------------------------------------------------
+# Overview "specimen sheet": a real, cached analysis of a synthetic example abstract
+# ---------------------------------------------------------------------------
+DEMO_TEXT = ("Chronic low back pain is a leading cause of disability and is commonly managed with analgesics. "
+             "We aimed to evaluate whether a 12-week supervised exercise programme reduces pain intensity compared with usual care. "
+             "In this randomized controlled trial, 120 adults with chronic low back pain were assigned to exercise (n = 60) or usual care (n = 60). "
+             "The primary outcome was pain intensity on a 0-10 numeric scale at 12 weeks. "
+             "Pain decreased by 2.4 points in the exercise group and by 0.9 points in the usual care group (mean difference 1.5, 95% CI 0.8 to 2.2; p < 0.001). "
+             "No serious adverse events were reported. "
+             "A supervised exercise programme reduced pain more than usual care in adults with chronic low back pain.")
+_DEMO: dict = {}
+
+
+def hero_demo():
+    """Run the deployed models once on the synthetic example; None if any model is missing (nothing is faked)."""
+    if "v" in _DEMO:
+        return _DEMO["v"]
+    try:
+        t0 = time.perf_counter()
+        sents = split_sentences(DEMO_TEXT)
+        res = clf_mod.classify_sentences(sents)
+        rows = []
+        for r in res:
+            n = recognise(r["text"], "biobert")
+            rows.append({"label": r["label"], "score": r["score"], "segments": n["segments"]})
+        _DEMO["v"] = {"rows": rows, "model": clf_mod.get_classifier().info()["name"], "seconds": time.perf_counter() - t0,
+                      "n_entities": sum(1 for x in rows for s in x["segments"] if s[1]), "counts": Counter(r["label"] for r in rows)}
+    except Exception:  # missing artifacts or any failure -> the overview shows a plain note
+        _DEMO["v"] = None
+    return _DEMO["v"]
+
+
+# ---------------------------------------------------------------------------
 # App factory
 # ---------------------------------------------------------------------------
 def create_app() -> Flask:
@@ -232,7 +264,7 @@ def create_app() -> Flask:
         ]
         return page("index.html", ["Overview"], fact=fact, deployed=metrics.get(dep) if dep else None, ner=(ner_m.get("biobert") if ner_m else None),
                     summ=(sum_m.get("systems", {}).get("T5-small medical") if sum_m else None), dataset=stats, recent=rows,
-                    timeline=list(reversed([dict(r) for r in per_day])), milestones=milestones, total=total)
+                    timeline=list(reversed([dict(r) for r in per_day])), milestones=milestones, total=total, demo=hero_demo())
 
     # ---- Research Explorer (integrated) ----
     @app.route("/explorer", methods=["GET", "POST"])
